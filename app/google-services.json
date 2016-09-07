@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "380109940768",
+    "firebase_url": "https://tattoos-2166f.firebaseio.com",
+    "project_id": "tattoos-2166f",
+    "storage_bucket": "tattoos-2166f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380109940768:android:8fd4f11d794549ee",
+        "android_client_info": {
+          "package_name": "com.tattoos.clientapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "380109940768-hjv1dq1f8v3sc1btckq05b7uh0el9nd0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tattoos.clientapp",
+            "certificate_hash": "0FA82DB568F04DA64FFEC407FBCD5FBA98073639"
+          }
+        },
+        {
+          "client_id": "380109940768-ehhme1ke99q0jt4p9smecvqvig6oufgc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiW55ZAP79TAxDjhrT4OAzvAIVACqScvw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "380109940768-ehhme1ke99q0jt4p9smecvqvig6oufgc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
