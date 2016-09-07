@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.tattoos.clientapp.R;
 import com.tattoos.clientapp.adapters.GridItem;
 import com.tattoos.clientapp.adapters.GridViewAdapter;
+import com.tattoos.clientapp.enums.IntentKeys;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -43,7 +45,7 @@ public class ShowroomActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private GridViewAdapter mGridAdapter;
     private ArrayList<GridItem> mGridData;
-    private String FEED_URL = "http://192.168.1.69:9999/images";
+    private String FEED_URL = "http://192.168.1.69:9999/images?count=10";
 
     private final OkHttpClient client = new OkHttpClient();
 
@@ -66,10 +68,13 @@ public class ShowroomActivity extends AppCompatActivity {
                 //Get item at position
                 GridItem item = (GridItem) parent.getItemAtPosition(position);
 
-                //Pass the image title and url to DetailsActivity
+                //Pass the image details to DetailsActivity
                 Intent intent = new Intent(ShowroomActivity.this, DetailsActivity.class);
-                intent.putExtra("title", item.getTitle());
-                intent.putExtra("image", item.getImage());
+                intent.putExtra(IntentKeys.IMG_TITLE.toString(), item.getTitle());
+                intent.putExtra(IntentKeys.IMG_SOURCE.toString(), item.getImage());
+                intent.putExtra(IntentKeys.IMG_AUTHOR.toString(), item.getAuthor());
+                intent.putExtra(IntentKeys.IMG_BODY_PART.toString(), item.getBodyPart());
+                intent.putExtra(IntentKeys.IMG_STYLE.toString(), item.getStyle());
 
                 //Start details activity
                 startActivity(intent);
@@ -125,11 +130,20 @@ public class ShowroomActivity extends AppCompatActivity {
                 GridItem item;
                 for (int i = 0; i < images.length(); i++) {
                     JSONObject image = images.optJSONObject(i);
-                    String title = image.optString("imageTitle");
-                    String url = image.optString("imageURL");
+                    String title = image.optString("imgTitle");
+                    String author = image.optString("imgAuthor");
+                    String bodyPart = image.optString("imgBodyPart");
+                    String style = image.optString("imgStyle");
+
+                    String imageStr = image.optString("imgBytes");
+                    byte[] imgBytes = Base64.decode(imageStr, Base64.DEFAULT);
+
                     item = new GridItem();
                     item.setTitle(title);
-                    item.setImage(url);
+                    item.setImage(imgBytes);
+                    item.setAuthor(author);
+                    item.setBodyPart(bodyPart);
+                    item.setStyle(style);
                     mGridData.add(item);
                 }
             } catch (JSONException e) {
