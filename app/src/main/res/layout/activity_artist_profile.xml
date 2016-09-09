@@ -24,13 +24,10 @@
             android:textStyle="bold"
             android:layout_gravity="left" />
 
-        <ImageView
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/profileImageView"
-            android:layout_gravity="center_horizontal" />
+        <android.support.v4.view.ViewPager
+            android:id="@+id/profileViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
 
         <LinearLayout
             android:orientation="horizontal"

@@ -9,5 +9,7 @@ public enum JSONKeys {
 
     ARTIST_AVATAR,
     ARTIST_BIO,
-    ARTIST_NAME
+    ARTIST_NAME,
+    ARTIST_EMAIL,
+    ARTIST_TATTOOS
 }

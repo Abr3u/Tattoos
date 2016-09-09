@@ -2,30 +2,28 @@ package com.tattoos.clientapp.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.AsyncTask;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
+import com.tattoos.clientapp.adapters.PagerViewAdapter;
 import com.tattoos.clientapp.enums.JSONKeys;
 import com.tattoos.clientapp.location.GPSTracker;
 import com.tattoos.clientapp.location.LocationParser;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,13 +35,16 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView artistBio;
     private TextView artistName;
     private TextView artistLocation;
-    private ImageView artistAvatar;
+    private ViewPager artistAvatars;
+
+    private ArrayList<Bitmap> mBitMaps;
 
     private MyApplicationContext myApplicationContext;
 
     private String ARTISTS_URL = "http://192.168.1.69:9999/artists";
 
     private final OkHttpClient client = new OkHttpClient();
+    private PagerViewAdapter adapterView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,17 +52,21 @@ public class ArtistProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_artist_profile);
 
         mGPS = new GPSTracker(ArtistProfileActivity.this);
+        mBitMaps = new ArrayList<Bitmap>();
 
         artistBio = (TextView) findViewById(R.id.UserBio);
         artistName = (TextView) findViewById(R.id.UserName);
         artistLocation = (TextView) findViewById(R.id.UserLocation);
-        artistAvatar = (ImageView) findViewById(R.id.profileImageView);
+        artistAvatars = (ViewPager) findViewById(R.id.profileViewPager);
 
         myApplicationContext = (MyApplicationContext) getApplicationContext();
 
         String myUrl = ARTISTS_URL + "?email=" + myApplicationContext.getEmail();
 
-        if (myApplicationContext.getArtistAvatar() == null || myApplicationContext.getArtistName().isEmpty() ||
+        adapterView = new PagerViewAdapter(this,mBitMaps);
+        artistAvatars.setAdapter(adapterView);
+
+        if (myApplicationContext.getArtistTattoos().isEmpty() || myApplicationContext.getArtistName().isEmpty() ||
                 myApplicationContext.getArtistBio().isEmpty()) {
             Log.d("yyy","not cached");
             new AsyncHttpTask().execute(myUrl);
@@ -71,7 +76,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
             artistName.setText(myApplicationContext.getArtistName());
             artistBio.setText(myApplicationContext.getArtistBio());
             artistLocation.setText(myApplicationContext.getLastKnownLocation());
-            artistAvatar.setImageBitmap(myApplicationContext.getArtistAvatar());
+            adapterView.setBitmaps(myApplicationContext.getArtistTattoos());
         }
     }
 
@@ -117,6 +122,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
             // Download complete. Let us update UI
             if (!result.isEmpty()) {
                 updateUI(result);
+                adapterView.setBitmaps(mBitMaps);
                 artistLocation.setText(locality);
             } else {
                 Toast.makeText(ArtistProfileActivity.this, "Failed to fetch data!", Toast.LENGTH_SHORT).show();
@@ -129,20 +135,29 @@ public class ArtistProfileActivity extends AppCompatActivity {
             JSONObject artist = new JSONObject(json);
             String name = artist.getString(JSONKeys.ARTIST_NAME.toString());
             String bio = artist.getString(JSONKeys.ARTIST_BIO.toString());
-            String avatarStr = artist.getString(JSONKeys.ARTIST_AVATAR.toString());
 
+            String avatarStr = artist.getString(JSONKeys.ARTIST_AVATAR.toString());
             byte[] avatarBytes = Base64.decode(avatarStr, Base64.DEFAULT);
-            Bitmap bmp = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
+            Bitmap avatar = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
+            mBitMaps.add(avatar);
+
+            JSONArray tattoos = artist.getJSONArray(JSONKeys.ARTIST_TATTOOS.toString());
+            int i;
+            for(i=0;i<tattoos.length();i++){
+                String tattooStr = tattoos.getString(i);
+                byte[] tattooBytes = Base64.decode(tattooStr, Base64.DEFAULT);
+                Bitmap tattoo = BitmapFactory.decodeByteArray(tattooBytes, 0, tattooBytes.length);
+                mBitMaps.add(tattoo);
+            }
 
             //cache artist info
             myApplicationContext.setArtistName(name);
             myApplicationContext.setArtistBio(bio);
-            myApplicationContext.setArtistAvatar(bmp);
+            myApplicationContext.setArtistTattoos(mBitMaps);
 
             //update UI
             artistName.setText(name);
             artistBio.setText(bio);
-            artistAvatar.setImageBitmap(bmp);
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -13,12 +13,11 @@ public class MyApplicationContext extends Application{
     private String _photoURL;
     private String _email;
     private String _lastKnownLocation;
-
-    private Bitmap _artistAvatar;
     private String _artistBio;
     private String _artistName;
 
     private ArrayList<GridItem> gridItemCache;
+    private ArrayList<Bitmap> artistTattoos;
 
     @Override
     public void onCreate() {
@@ -30,6 +29,7 @@ public class MyApplicationContext extends Application{
         _artistBio = "";
         _artistName = "";
         gridItemCache = new ArrayList<GridItem>();
+        artistTattoos = new ArrayList<Bitmap>();
     }
 
     public String getUsername() {
@@ -72,14 +72,6 @@ public class MyApplicationContext extends Application{
         this._lastKnownLocation = lastKnownLocation;
     }
 
-    public Bitmap getArtistAvatar() {
-        return _artistAvatar;
-    }
-
-    public void setArtistAvatar(Bitmap artistAvatar) {
-        this._artistAvatar = artistAvatar;
-    }
-
     public String getArtistBio() {
         return _artistBio;
     }
@@ -94,6 +86,14 @@ public class MyApplicationContext extends Application{
 
     public void setArtistName(String artistName) {
         this._artistName = artistName;
+    }
+
+    public ArrayList<Bitmap> getArtistTattoos() {
+        return artistTattoos;
+    }
+
+    public void setArtistTattoos(ArrayList<Bitmap> artistTattoos) {
+        this.artistTattoos = artistTattoos;
     }
 
 }
