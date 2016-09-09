@@ -28,16 +28,16 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/global_showroom"
-            android:id="@+id/GlobalShowroom"
-            android:onClick="globalShowroomButtonClicked"
+            android:text="@string/tattoos"
+            android:id="@+id/Tattoos"
+            android:onClick="tattoosButtonClicked"
             android:layout_gravity="center_horizontal" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/your_showroom"
-            android:id="@+id/showroom"
-            android:onClick="yourShowroomButtonClicked"
+            android:text="@string/artists"
+            android:id="@+id/Artists"
+            android:onClick="artistsButtonClicked"
             android:layout_gravity="center_horizontal" />
     </LinearLayout>
 </RelativeLayout>

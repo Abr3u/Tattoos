@@ -57,10 +57,20 @@ public class GridViewAdapter extends ArrayAdapter<GridItem> {
         }
 
         GridItem item = mGridData.get(position);
-        holder.titleTextView.setText(Html.fromHtml(item.getTitle()));
 
-        Bitmap bmp = BitmapFactory.decodeByteArray(item.getImage(), 0, item.getImage().length);
-        holder.imageView.setImageBitmap(bmp);
+        if(item.getTattoo_title() == null){
+            holder.titleTextView.setText(item.getArtist_name());
+        }else{
+            holder.titleTextView.setText(item.getTattoo_title());
+        }
+
+        if(item.getTattoo_bytes() == null){
+            Bitmap bmp = BitmapFactory.decodeByteArray(item.getArtist_avatar(), 0, item.getArtist_avatar().length);
+            holder.imageView.setImageBitmap(bmp);
+        }else{
+            Bitmap bmp = BitmapFactory.decodeByteArray(item.getTattoo_bytes(), 0, item.getTattoo_bytes().length);
+            holder.imageView.setImageBitmap(bmp);
+        }
         return row;
     }
 

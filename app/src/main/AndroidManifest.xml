@@ -20,8 +20,7 @@
         </activity>
         <activity android:name=".activities.SignInActivity" />
         <activity android:name=".activities.ShowroomActivity" />
-        <activity android:name=".activities.DetailsActivity" />
-        <activity android:name=".activities.Aux"></activity>
+        <activity android:name=".activities.TattooDetailsActivity" />
     </application>
 
 </manifest>

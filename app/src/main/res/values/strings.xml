@@ -2,6 +2,6 @@
     <string name="app_name">ClientApp</string>
     <string name="signIn">Sign In</string>
     <string name="your_profile">Your profile</string>
-    <string name="global_showroom">Global Showroom</string>
-    <string name="your_showroom">Your Showroom</string>
+    <string name="tattoos">Tattoos</string>
+    <string name="artists">Artists</string>
 </resources>
