@@ -11,6 +11,7 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
 import com.tattoos.clientapp.adapters.GridItem;
 import com.tattoos.clientapp.adapters.GridViewAdapter;
@@ -33,11 +34,15 @@ public class ShowroomActivity extends AppCompatActivity {
     private static final String TAG = ShowroomActivity.class.getSimpleName();
 
     private String showroomType;
+    private boolean cached;
+
+    private MyApplicationContext myApplicationContext;
+    private ProgressBar mProgressBar;
 
     private GridView mGridView;
-    private ProgressBar mProgressBar;
     private GridViewAdapter mGridAdapter;
     private ArrayList<GridItem> mGridData;
+
     private String TATTOOS_URL = "http://192.168.1.69:9999/tattoos?count=10";
     private String ARTISTS_URL = "http://192.168.1.69:9999/artists";
 
@@ -53,8 +58,17 @@ public class ShowroomActivity extends AppCompatActivity {
         mGridView = (GridView) findViewById(R.id.gridview);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        //Initialize with empty data
-        mGridData = new ArrayList<>();
+        myApplicationContext = (MyApplicationContext) getApplicationContext();
+
+        if(myApplicationContext.getGridItemCache().isEmpty()){
+            //Initialize with empty data
+            mGridData = new ArrayList<>();
+            cached = false;
+        }else{
+            //Initialize with cached data
+            mGridData = myApplicationContext.getGridItemCache();
+            cached = true;
+        }
         mGridAdapter = new GridViewAdapter(this, R.layout.grid_item, mGridData);
         mGridView.setAdapter(mGridAdapter);
 
@@ -88,6 +102,16 @@ public class ShowroomActivity extends AppCompatActivity {
             }
         });
 
+        if(!cached){
+            if (showroomType.equals("tattoos")) {
+                new AsyncHttpTask().execute(TATTOOS_URL);
+            } else {
+                new AsyncHttpTask().execute(ARTISTS_URL);
+            }
+        }
+    }
+
+    public void refreshButtonClicked(View view) {
         if (showroomType.equals("tattoos")) {
             new AsyncHttpTask().execute(TATTOOS_URL);
         } else {
@@ -126,6 +150,7 @@ public class ShowroomActivity extends AppCompatActivity {
         protected void onPostExecute(Integer result) {
             // Download complete. Let us update UI
             if (result == 1) {
+                myApplicationContext.setGridItemCache(mGridData);
                 mGridAdapter.setGridData(mGridData);
             } else {
                 Toast.makeText(ShowroomActivity.this, "Failed to fetch data!", Toast.LENGTH_SHORT).show();

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.auth.api.Auth;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         } else {
             //setup username and photoURL
             mContext.setUsername(mFirebaseUser.getDisplayName());
+            mContext.setEmail(mFirebaseUser.getEmail());
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mContext.setPhotoURL(mFirebaseUser.getPhotoUrl().toString());
             }
@@ -74,6 +76,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void artistsButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this,ShowroomActivity.class);
         intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(),"artists");
+        startActivity(intent);
+    }
+
+    public void yourProfileButtonClicked(View view) {
+        Intent intent = new Intent(MainActivity.this,ArtistProfileActivity.class);
         startActivity(intent);
     }
 }

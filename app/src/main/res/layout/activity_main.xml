@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             android:text="@string/your_profile"
             android:id="@+id/yourProfileButton"
+            android:onClick="yourProfileButtonClicked"
             android:layout_gravity="center_horizontal" />
 
         <Button

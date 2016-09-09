@@ -4,4 +4,7 @@
     <string name="your_profile">Your profile</string>
     <string name="tattoos">Tattoos</string>
     <string name="artists">Artists</string>
+    <string name="refreshButton">Refresh</string>
+    <string name="UserLocation">Location:</string>
+    <string name="UserBioHolder">About me:</string>
 </resources>
