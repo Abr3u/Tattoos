@@ -16,7 +16,8 @@ public class MyApplicationContext extends Application{
     private String _artistBio;
     private String _artistName;
 
-    private ArrayList<GridItem> gridItemCache;
+    private ArrayList<GridItem> tattoosCache;
+    private ArrayList<GridItem> artistsCache;
     private ArrayList<Bitmap> artistTattoos;
 
     @Override
@@ -28,7 +29,8 @@ public class MyApplicationContext extends Application{
         _lastKnownLocation = "";
         _artistBio = "";
         _artistName = "";
-        gridItemCache = new ArrayList<GridItem>();
+        tattoosCache = new ArrayList<GridItem>();
+        artistsCache = new ArrayList<GridItem>();
         artistTattoos = new ArrayList<Bitmap>();
     }
 
@@ -56,12 +58,20 @@ public class MyApplicationContext extends Application{
         this._email = email;
     }
 
-    public ArrayList<GridItem> getGridItemCache() {
-        return gridItemCache;
+    public ArrayList<GridItem> getTattoosCache() {
+        return tattoosCache;
     }
 
-    public void setGridItemCache(ArrayList<GridItem> gridItemCache) {
-        this.gridItemCache = gridItemCache;
+    public void setTattoosCache(ArrayList<GridItem> tattoosCache) {
+        this.tattoosCache = tattoosCache;
+    }
+
+    public ArrayList<GridItem> getArtistsCache() {
+        return artistsCache;
+    }
+
+    public void setArtistsCache(ArrayList<GridItem> artistsCache) {
+        this.artistsCache = artistsCache;
     }
 
     public String getLastKnownLocation() {

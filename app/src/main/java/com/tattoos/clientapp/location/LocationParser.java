@@ -1,5 +1,7 @@
 package com.tattoos.clientapp.location;
 
+import android.util.Log;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -67,6 +69,7 @@ public class LocationParser {
                 String postalCode = PostalCodeObject.optString("long_name");
                 if(postalCode != null) return postalCode;
             }
+            Log.d("yyy","tava tudo a null");
 
         } catch (JSONException e) {
             e.printStackTrace();

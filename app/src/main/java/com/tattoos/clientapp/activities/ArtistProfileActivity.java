@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +38,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView artistName;
     private TextView artistLocation;
     private ViewPager artistAvatars;
+    private ProgressBar mProgressBar;
 
     private ArrayList<Bitmap> mBitMaps;
 
@@ -54,6 +57,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
         mGPS = new GPSTracker(ArtistProfileActivity.this);
         mBitMaps = new ArrayList<Bitmap>();
 
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         artistBio = (TextView) findViewById(R.id.UserBio);
         artistName = (TextView) findViewById(R.id.UserName);
         artistLocation = (TextView) findViewById(R.id.UserLocation);
@@ -94,6 +98,11 @@ public class ArtistProfileActivity extends AppCompatActivity {
         private String locality;
 
         @Override
+        protected void onPreExecute() {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected String doInBackground(String... params) {
 
             if (myApplicationContext.getLastKnownLocation().isEmpty()) {
@@ -124,6 +133,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 updateUI(result);
                 adapterView.setBitmaps(mBitMaps);
                 artistLocation.setText(locality);
+                mProgressBar.setVisibility(View.GONE);
             } else {
                 Toast.makeText(ArtistProfileActivity.this, "Failed to fetch data!", Toast.LENGTH_SHORT).show();
             }

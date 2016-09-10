@@ -5,8 +5,10 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -38,6 +40,7 @@ public class ShowroomActivity extends AppCompatActivity {
 
     private MyApplicationContext myApplicationContext;
     private ProgressBar mProgressBar;
+    private Button refreshButton;
 
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
@@ -55,20 +58,42 @@ public class ShowroomActivity extends AppCompatActivity {
 
         showroomType = getIntent().getStringExtra(IntentKeys.SHOWROOM_TYPE.toString());
 
+        refreshButton = (Button) findViewById(R.id.refreshButton);
         mGridView = (GridView) findViewById(R.id.gridview);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         myApplicationContext = (MyApplicationContext) getApplicationContext();
 
-        if(myApplicationContext.getGridItemCache().isEmpty()){
-            //Initialize with empty data
-            mGridData = new ArrayList<>();
-            cached = false;
-        }else{
-            //Initialize with cached data
-            mGridData = myApplicationContext.getGridItemCache();
-            cached = true;
+        switch (showroomType){
+            case "tattoos":
+                if(myApplicationContext.getTattoosCache().isEmpty()){
+                    Log.d("yyy","not cached");
+                    //Initialize with empty data
+                    mGridData = new ArrayList<>();
+                    cached = false;
+                }
+                else{
+                    Log.d("yyy","cached");
+                    //Initialize with cached data
+                    mGridData = myApplicationContext.getTattoosCache();
+                    cached = true;
+                }
+                break;
+            case "artists":
+                if(myApplicationContext.getArtistsCache().isEmpty()){
+                    Log.d("yyy","not cached");
+                    //Initialize with empty data
+                    mGridData = new ArrayList<>();
+                    cached = false;
+                }
+                else{
+                    Log.d("yyy","cached");
+                    //Initialize with cached data
+                    mGridData = myApplicationContext.getArtistsCache();
+                    cached = true;
+                }
         }
+
         mGridAdapter = new GridViewAdapter(this, R.layout.grid_item, mGridData);
         mGridView.setAdapter(mGridAdapter);
 
@@ -125,6 +150,7 @@ public class ShowroomActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             mProgressBar.setVisibility(View.VISIBLE);
+            refreshButton.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -150,12 +176,17 @@ public class ShowroomActivity extends AppCompatActivity {
         protected void onPostExecute(Integer result) {
             // Download complete. Let us update UI
             if (result == 1) {
-                myApplicationContext.setGridItemCache(mGridData);
+                if(showroomType.equals("tattoos")){
+                    myApplicationContext.setTattoosCache(mGridData);
+                }else{
+                    myApplicationContext.setArtistsCache(mGridData);
+                }
                 mGridAdapter.setGridData(mGridData);
             } else {
                 Toast.makeText(ShowroomActivity.this, "Failed to fetch data!", Toast.LENGTH_SHORT).show();
             }
             mProgressBar.setVisibility(View.GONE);
+            refreshButton.setVisibility(View.VISIBLE);
         }
     }
 
