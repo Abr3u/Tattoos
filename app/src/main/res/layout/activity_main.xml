@@ -40,5 +40,13 @@
             android:id="@+id/Artists"
             android:onClick="artistsButtonClicked"
             android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Up as Artist"
+            android:id="@+id/signUpArtist"
+            android:onClick="signUpArtistButtonClicked"
+            android:layout_gravity="center_horizontal" />
     </LinearLayout>
 </RelativeLayout>

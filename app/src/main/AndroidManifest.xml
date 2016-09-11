@@ -26,7 +26,8 @@
         <activity android:name=".activities.SignInActivity" />
         <activity android:name=".activities.ShowroomActivity" />
         <activity android:name=".activities.TattooDetailsActivity" />
-        <activity android:name=".activities.ArtistProfileActivity"></activity>
+        <activity android:name=".activities.ArtistProfileActivity" />
+        <activity android:name=".activities.SignUpArtistActivity"></activity>
     </application>
 
 </manifest>

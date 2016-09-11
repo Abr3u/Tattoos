@@ -7,4 +7,10 @@
     <string name="refreshButton">Refresh</string>
     <string name="UserLocation">Location:</string>
     <string name="UserBioHolder">About me:</string>
+    <string name="signUpArtistName">Name:</string>
+    <string name="signUpArtistBio">About you:</string>
+    <string name="no_picture_selected">no picture selected</string>
+    <string name="signUpArtistAvatarHolder">Your Avatar</string>
+    <string name="choose_existing_picture">Choose Existing Picture</string>
+    <string name="submitButton">Submit</string>
 </resources>

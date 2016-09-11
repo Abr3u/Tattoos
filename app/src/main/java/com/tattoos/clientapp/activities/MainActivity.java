@@ -83,4 +83,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Intent intent = new Intent(MainActivity.this,ArtistProfileActivity.class);
         startActivity(intent);
     }
+
+    public void signUpArtistButtonClicked(View view) {
+        Intent intent = new Intent(MainActivity.this,SignUpArtistActivity.class);
+        startActivity(intent);
+    }
 }
