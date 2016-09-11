@@ -57,7 +57,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
         mGPS = new GPSTracker(ArtistProfileActivity.this);
         mBitMaps = new ArrayList<Bitmap>();
 
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mProgressBar = (ProgressBar) findViewById(R.id.artistProgressBar);
         artistBio = (TextView) findViewById(R.id.UserBio);
         artistName = (TextView) findViewById(R.id.UserName);
         artistLocation = (TextView) findViewById(R.id.UserLocation);
