@@ -47,7 +47,8 @@ public class SignUpArtistActivity extends AppCompatActivity {
     private static final int SELECT_PHOTO = 1;
     private static final int TAKE_PHOTO = 2;
     private final String selectSuccess = "picture selected";
-    private final String selectFailure = "picture couldnt be selected";
+    private final String selectFailure = "select another picture";
+
 
     private EditText artistBio;
     private Button submitButton;
@@ -59,9 +60,10 @@ public class SignUpArtistActivity extends AppCompatActivity {
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
     private int counter;
+    private int indexToUpdate;
     private String picturesDirectory;
     private String locality;
-    private ArrayList<Uri> localImagesUris;
+    private Uri[] localImagesUris;
     private ArrayList<String> downloadUrls;
     private MyApplicationContext mContext;
     private GPSTracker mGPS;
@@ -74,13 +76,14 @@ public class SignUpArtistActivity extends AppCompatActivity {
         mContext = (MyApplicationContext) getApplicationContext();
 
         mGPS = new GPSTracker(SignUpArtistActivity.this);
-        localImagesUris = new ArrayList<Uri>();
+        localImagesUris = new Uri[4];
         downloadUrls = new ArrayList<String>();
 
         mProgressBar = (ProgressBar) findViewById(R.id.signUpProgressBar);
         artistBio = (EditText) findViewById(R.id.artistBio);
         submitButton = (Button) findViewById(R.id.submitButton);
 
+        counter = 0;
         locality = "undefined";
         picturesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/picFolder/";
         File newdir = new File(picturesDirectory);
@@ -96,10 +99,27 @@ public class SignUpArtistActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         //both take and select photo do the same
         if (resultCode == RESULT_OK) {
-            localImagesUris.add(imageReturnedIntent.getData());
+            if (uriAlreadyExists(localImagesUris, imageReturnedIntent.getData())) {
+                textViewToUpdate.setText(selectFailure);
+                textViewToUpdate.setBackgroundColor(Color.RED);
+                return;
+            }
+            if (counter < 4) {
+                counter++;
+                Log.d("yyy", "counter ficou " + counter);
+            }
             textViewToUpdate.setText(selectSuccess);
             textViewToUpdate.setBackgroundColor(Color.GREEN);
+            localImagesUris[indexToUpdate] = imageReturnedIntent.getData();
         }
+    }
+
+    private boolean uriAlreadyExists(Uri[] localImagesUris, Uri toCheck) {
+        if (localImagesUris[0] != null && localImagesUris[0].equals(toCheck)) return true;
+        if (localImagesUris[1] != null && localImagesUris[1].equals(toCheck)) return true;
+        if (localImagesUris[2] != null && localImagesUris[2].equals(toCheck)) return true;
+        if (localImagesUris[3] != null && localImagesUris[3].equals(toCheck)) return true;
+        return false;
     }
 
 
@@ -107,7 +127,8 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
         final String bio = artistBio.getText().toString().trim();
 
-        if (bio.isEmpty() || localImagesUris.size() == 0) {
+        if (bio.isEmpty() || (localImagesUris[0] == null && localImagesUris[1] == null && localImagesUris[2] == null && localImagesUris[3] == null)) {
+            Log.d("yyy", "not all info");
             Toast.makeText(SignUpArtistActivity.this, "Please fill in all the information", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -129,15 +150,18 @@ public class SignUpArtistActivity extends AppCompatActivity {
                                     "Error: could not fetch user.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            counter = localImagesUris.size();
-                            for(Uri uri:localImagesUris){
-                                ImageUploaderThread thread = new ImageUploaderThread(uri,userId);
-                                new Thread(thread).start();
+                            for (Uri uri : localImagesUris) {
+                                Log.d("yyy","uri -> "+uri);
+                                if (uri != null) {
+                                    Log.d("yyy", "uploading img");
+                                    ImageUploaderThread thread = new ImageUploaderThread(uri, userId);
+                                    new Thread(thread).start();
+                                }
                             }
-                            while(counter!=0){
+                            while (counter != 0) {
 
                             }
-                            writeNewArtist(userId,bio,user.username,downloadUrls);
+                            writeNewArtist(userId, bio, user.username, downloadUrls);
                         }
                     }
 
@@ -156,15 +180,19 @@ public class SignUpArtistActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.takePictureButton1:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo1Holder);
+                indexToUpdate = 0;
                 break;
             case R.id.takePictureButton2:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo2Holder);
+                indexToUpdate = 1;
                 break;
             case R.id.takePictureButton3:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo3Holder);
+                indexToUpdate = 2;
                 break;
             case R.id.takePictureButton4:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo4Holder);
+                indexToUpdate = 3;
                 break;
         }
         Date now = new Date();
@@ -187,15 +215,19 @@ public class SignUpArtistActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.cameraRollButton1:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo1Holder);
+                indexToUpdate = 0;
                 break;
             case R.id.cameraRollButton2:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo2Holder);
+                indexToUpdate = 1;
                 break;
             case R.id.cameraRollButton3:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo3Holder);
+                indexToUpdate = 2;
                 break;
             case R.id.cameraRollButton4:
                 textViewToUpdate = (TextView) findViewById(R.id.tattoo4Holder);
+                indexToUpdate = 3;
                 break;
         }
         Intent i = new Intent(Intent.ACTION_PICK,
@@ -210,6 +242,7 @@ public class SignUpArtistActivity extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
                 downloadUrls.add(downloadUrl.toString());
+                Log.d("yyy", "uploaded");
                 counter--;
             }
         }).addOnFailureListener(this, new OnFailureListener() {
@@ -220,8 +253,8 @@ public class SignUpArtistActivity extends AppCompatActivity {
         });
     }
 
-    private void writeNewArtist(String userId, String bio,String username, ArrayList<String> urls) {
-        Artist artist = new Artist(username,bio, locality, urls);
+    private void writeNewArtist(String userId, String bio, String username, ArrayList<String> urls) {
+        Artist artist = new Artist(username, bio, locality, urls);
         Map<String, Object> artistValues = artist.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
