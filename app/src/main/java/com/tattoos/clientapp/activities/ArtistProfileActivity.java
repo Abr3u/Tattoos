@@ -13,41 +13,48 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
 import com.tattoos.clientapp.adapters.PagerViewAdapter;
 import com.tattoos.clientapp.enums.JSONKeys;
 import com.tattoos.clientapp.location.GPSTracker;
 import com.tattoos.clientapp.location.LocationParser;
+import com.tattoos.clientapp.models.Artist;
+import com.tattoos.clientapp.models.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class ArtistProfileActivity extends AppCompatActivity {
 
     private GPSTracker mGPS;
+
     private TextView artistBio;
     private TextView artistName;
     private TextView artistLocation;
     private ViewPager artistAvatars;
     private ProgressBar mProgressBar;
 
-    private ArrayList<Bitmap> mBitMaps;
+    private ArrayList<String> mUrls;
 
-    private MyApplicationContext myApplicationContext;
+    private MyApplicationContext mContext;
 
-    private String ARTISTS_URL = "http://192.168.1.69:9999/artists";
-
-    private final OkHttpClient client = new OkHttpClient();
     private PagerViewAdapter adapterView;
+
+    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +62,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_artist_profile);
 
         mGPS = new GPSTracker(ArtistProfileActivity.this);
-        mBitMaps = new ArrayList<Bitmap>();
+        mUrls = new ArrayList<String>();
 
         mProgressBar = (ProgressBar) findViewById(R.id.artistProgressBar);
         artistBio = (TextView) findViewById(R.id.UserBio);
@@ -63,25 +70,43 @@ public class ArtistProfileActivity extends AppCompatActivity {
         artistLocation = (TextView) findViewById(R.id.UserLocation);
         artistAvatars = (ViewPager) findViewById(R.id.profileViewPager);
 
-        myApplicationContext = (MyApplicationContext) getApplicationContext();
+        mContext = (MyApplicationContext) getApplicationContext();
 
-        String myUrl = ARTISTS_URL + "?email=" + myApplicationContext.getEmail();
-
-        adapterView = new PagerViewAdapter(this,mBitMaps);
+        adapterView = new PagerViewAdapter(this,mUrls);
         artistAvatars.setAdapter(adapterView);
 
-        if (myApplicationContext.getArtistTattoos().isEmpty() || myApplicationContext.getArtistName().isEmpty() ||
-                myApplicationContext.getArtistBio().isEmpty()) {
-            Log.d("yyy","not cached");
-            new AsyncHttpTask().execute(myUrl);
-        }else{
-            Log.d("yyy","cached");
-            //update UI based on cached info
-            artistName.setText(myApplicationContext.getArtistName());
-            artistBio.setText(myApplicationContext.getArtistBio());
-            artistLocation.setText(myApplicationContext.getLastKnownLocation());
-            adapterView.setBitmaps(myApplicationContext.getArtistTattoos());
-        }
+        fetchArtistData();
+    }
+
+    private void fetchArtistData() {
+        final String userId = mContext.getFirebaseUser().getUid();
+        mDatabase.child("artists").child(userId).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get user value
+                        Artist artist = dataSnapshot.getValue(Artist.class);
+
+                        // [START_EXCLUDE]
+                        if (artist == null) {
+                            // User is null, error out
+                            Log.e("yyy", "Artist " + userId + " is unexpectedly null");
+                            Toast.makeText(ArtistProfileActivity.this,
+                                    "Error: could not fetch artist.",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            mUrls.add(artist.avatarURL);
+                            adapterView.setUrls(mUrls);
+                            artistBio.setText(artist.bio);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w("yyy", "getUser:onCancelled", databaseError.toException());
+                    }
+                });
+
     }
 
     private String getUserLocality() {
@@ -93,86 +118,5 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
 
-    public class AsyncHttpTask extends AsyncTask<String, Void, String> {
-
-        private String locality;
-
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            if (myApplicationContext.getLastKnownLocation().isEmpty()) {
-                locality = getUserLocality();
-                myApplicationContext.setLastKnownLocation(locality);
-            }
-
-            Request request = new Request.Builder()
-                    .url(params[0])
-                    .build();
-
-            Response response = null;
-            try {
-                response = client.newCall(request).execute();
-                if (response.isSuccessful()) {
-                    return response.body().string();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return "";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // Download complete. Let us update UI
-            if (!result.isEmpty()) {
-                updateUI(result);
-                adapterView.setBitmaps(mBitMaps);
-                artistLocation.setText(locality);
-                mProgressBar.setVisibility(View.GONE);
-            } else {
-                Toast.makeText(ArtistProfileActivity.this, "Failed to fetch data!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void updateUI(String json) {
-        try {
-            JSONObject artist = new JSONObject(json);
-            String name = artist.getString(JSONKeys.ARTIST_NAME.toString());
-            String bio = artist.getString(JSONKeys.ARTIST_BIO.toString());
-
-            String avatarStr = artist.getString(JSONKeys.ARTIST_AVATAR.toString());
-            byte[] avatarBytes = Base64.decode(avatarStr, Base64.DEFAULT);
-            Bitmap avatar = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
-            mBitMaps.add(avatar);
-
-            JSONArray tattoos = artist.getJSONArray(JSONKeys.ARTIST_TATTOOS.toString());
-            int i;
-            for(i=0;i<tattoos.length();i++){
-                String tattooStr = tattoos.getString(i);
-                byte[] tattooBytes = Base64.decode(tattooStr, Base64.DEFAULT);
-                Bitmap tattoo = BitmapFactory.decodeByteArray(tattooBytes, 0, tattooBytes.length);
-                mBitMaps.add(tattoo);
-            }
-
-            //cache artist info
-            myApplicationContext.setArtistName(name);
-            myApplicationContext.setArtistBio(bio);
-            myApplicationContext.setArtistTattoos(mBitMaps);
-
-            //update UI
-            artistName.setText(name);
-            artistBio.setText(bio);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
 }

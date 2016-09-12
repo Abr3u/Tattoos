@@ -8,27 +8,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.tattoos.clientapp.R;
 
 import java.util.ArrayList;
 
 public class PagerViewAdapter extends PagerAdapter {
-    private ArrayList<Bitmap> bitmaps;
+    private ArrayList<String> urls;
     private Context mContext;
 
-    public PagerViewAdapter(Context context, ArrayList<Bitmap> bitmaps) {
+    public PagerViewAdapter(Context context, ArrayList<String> urls) {
         this.mContext = context;
-        this.bitmaps = bitmaps;
+        this.urls = urls;
     }
 
-    public void setBitmaps(ArrayList<Bitmap> bm){
-        this.bitmaps = bm;
+    public void setUrls(ArrayList<String> urls){
+        this.urls = urls;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return bitmaps.size();
+        return urls.size();
     }
 
     @Override
@@ -39,8 +40,14 @@ public class PagerViewAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int i) {
         ImageView mImageView = new ImageView(mContext);
-        mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        mImageView.setImageBitmap(bitmaps.get(i));
+
+        Glide
+                .with(mContext)
+                .load(urls.get(i))
+                .centerCrop()
+                .crossFade()
+                .into(mImageView);
+
         ((ViewPager) container).addView(mImageView, 0);
         return mImageView;
     }

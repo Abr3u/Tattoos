@@ -27,10 +27,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 public class ShowroomActivity extends AppCompatActivity {
 
     private static final String TAG = ShowroomActivity.class.getSimpleName();
@@ -48,8 +44,6 @@ public class ShowroomActivity extends AppCompatActivity {
 
     private String TATTOOS_URL = "http://192.168.1.69:9999/tattoos?count=10";
     private String ARTISTS_URL = "http://192.168.1.69:9999/artists";
-
-    private final OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,75 +120,12 @@ public class ShowroomActivity extends AppCompatActivity {
                 }
             }
         });
-
-        if(!cached){
-            if (showroomType.equals("tattoos")) {
-                new AsyncHttpTask().execute(TATTOOS_URL);
-            } else {
-                new AsyncHttpTask().execute(ARTISTS_URL);
-            }
-        }
     }
 
     public void refreshButtonClicked(View view) {
-        if (showroomType.equals("tattoos")) {
-            new AsyncHttpTask().execute(TATTOOS_URL);
-        } else {
-            new AsyncHttpTask().execute(ARTISTS_URL);
-        }
+
     }
 
-    //Downloading data asynchronously
-    public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {
-
-        @Override
-        protected void onPreExecute() {
-            mProgressBar.setVisibility(View.VISIBLE);
-            refreshButton.setVisibility(View.INVISIBLE);
-        }
-
-        @Override
-        protected Integer doInBackground(String... params) {
-            Request request = new Request.Builder()
-                    .url(params[0])
-                    .build();
-
-            Response response = null;
-            try {
-                response = client.newCall(request).execute();
-                if (response.isSuccessful()) {
-                    parseResult(response.body().string());
-                    return 1;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return 0;
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            // Download complete. Let us update UI
-            if (result == 1) {
-                if(showroomType.equals("tattoos")){
-                    myApplicationContext.setTattoosCache(mGridData);
-                }else{
-                    myApplicationContext.setArtistsCache(mGridData);
-                }
-                mGridAdapter.setGridData(mGridData);
-            } else {
-                Toast.makeText(ShowroomActivity.this, "Failed to fetch data!", Toast.LENGTH_SHORT).show();
-            }
-            mProgressBar.setVisibility(View.GONE);
-            refreshButton.setVisibility(View.VISIBLE);
-        }
-    }
-
-    /**
-     * Parsing the feed results and get the list
-     *
-     * @param result
-     */
     private void parseResult(String result) {
 
         if (showroomType.equals("tattoos")) {

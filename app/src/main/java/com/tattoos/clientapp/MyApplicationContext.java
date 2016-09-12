@@ -3,6 +3,7 @@ package com.tattoos.clientapp;
 import android.app.Application;
 import android.graphics.Bitmap;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.tattoos.clientapp.adapters.GridItem;
 
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ public class MyApplicationContext extends Application{
     private ArrayList<GridItem> tattoosCache;
     private ArrayList<GridItem> artistsCache;
     private ArrayList<Bitmap> artistTattoos;
+
+    private FirebaseUser firebaseUser;
 
     @Override
     public void onCreate() {
@@ -106,4 +109,11 @@ public class MyApplicationContext extends Application{
         this.artistTattoos = artistTattoos;
     }
 
+    public void setFirebaseUser(FirebaseUser firebaseUser) {
+        this.firebaseUser = firebaseUser;
+    }
+
+    public FirebaseUser getFirebaseUser(){
+        return this.firebaseUser;
+    }
 }

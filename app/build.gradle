@@ -31,11 +31,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.0'
     //firebase
     compile 'com.google.firebase:firebase-auth:9.4.0'
+    compile 'com.google.firebase:firebase-storage:9.4.0'
+    compile 'com.google.firebase:firebase-database:9.4.0'
     //google auth
     compile 'com.google.android.gms:play-services-auth:9.4.0'
-    //okhhtp
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    //glide
+    compile 'com.github.bumptech.glide:glide:3.7.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

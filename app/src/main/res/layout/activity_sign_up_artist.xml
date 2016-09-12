@@ -91,31 +91,6 @@
 
         <LinearLayout
             android:layout_marginTop="20dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/signUpArtistName"
-                android:id="@+id/signUpArtistNameHolder"
-                android:textStyle="bold"
-                android:layout_weight="0.1"
-                android:layout_gravity="left|center_vertical" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.9"
-                android:id="@+id/artistName"
-                android:layout_gravity="right" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="20dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
