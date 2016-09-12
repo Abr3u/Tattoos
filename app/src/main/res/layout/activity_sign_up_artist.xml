@@ -32,7 +32,17 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Crate your Artist Profile"
+            android:textStyle="bold"
             android:id="@+id/signUpArtistHolder" />
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/showcase_your_tattos"
+            android:textStyle="bold"
+            android:id="@+id/chooseTattosHolder" />
 
         <LinearLayout
             android:layout_marginTop="20dp"
@@ -40,24 +50,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+            <Button
+                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/signUpArtistAvatarHolder"
-                android:id="@+id/signUpArtistPictureHolder"
-                android:textStyle="bold"
-                android:layout_weight="0.1"
-                android:layout_gravity="left|center_vertical" />
+                android:text="@string/choose_existing_picture"
+                android:id="@+id/cameraRollButton1"
+                android:onClick="choosePictureButtonClicked"
+                android:layout_gravity="center_vertical" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/take_picture"
+                android:id="@+id/takePictureButton1"
+                android:onClick="takePictureButtonClicked"
+                android:layout_gravity="center_vertical" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:hint="@string/no_picture_selected"
-                android:layout_weight="0.1"
-                android:layout_gravity="right"
-                android:id="@+id/artistPictureSelected"/>
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:hint="no picture selected"
+                android:id="@+id/tattoo1Holder"
+                android:layout_gravity="center_vertical" />
 
         </LinearLayout>
 
@@ -68,24 +85,98 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:enabled="true"
+                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/choose_existing_picture"
-                android:id="@+id/cameraRollButton"
+                android:id="@+id/cameraRollButton2"
                 android:onClick="choosePictureButtonClicked"
-                android:layout_weight="0.7"
-                android:layout_gravity="center_vertical|left" />
+                android:layout_gravity="center_vertical" />
 
             <Button
-                android:enabled="true"
+                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Take Picture"
-                android:id="@+id/takePictureButton"
+                android:text="@string/take_picture"
+                android:id="@+id/takePictureButton2"
                 android:onClick="takePictureButtonClicked"
-                android:layout_weight="0.3"
-                android:layout_gravity="center_vertical|right" />
+                android:layout_gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:hint="no picture selected"
+                android:id="@+id/tattoo2Holder"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_existing_picture"
+                android:id="@+id/cameraRollButton3"
+                android:onClick="choosePictureButtonClicked"
+                android:layout_gravity="center_vertical" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/take_picture"
+                android:id="@+id/takePictureButton3"
+                android:onClick="takePictureButtonClicked"
+                android:layout_gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:hint="no picture selected"
+                android:id="@+id/tattoo3Holder"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_existing_picture"
+                android:id="@+id/cameraRollButton4"
+                android:onClick="choosePictureButtonClicked"
+                android:layout_gravity="center_vertical" />
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/take_picture"
+                android:id="@+id/takePictureButton4"
+                android:onClick="takePictureButtonClicked"
+                android:layout_gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:hint="no picture selected"
+                android:id="@+id/tattoo4Holder"
+                android:layout_gravity="center_vertical" />
 
         </LinearLayout>
 

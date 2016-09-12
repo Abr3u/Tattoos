@@ -28,14 +28,16 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
+import com.tattoos.clientapp.location.GPSTracker;
+import com.tattoos.clientapp.location.LocationParser;
 import com.tattoos.clientapp.models.Artist;
 import com.tattoos.clientapp.models.User;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,40 +46,48 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
     private static final int SELECT_PHOTO = 1;
     private static final int TAKE_PHOTO = 2;
-    private final String selectSuccess = "picture successfully selected";
+    private final String selectSuccess = "picture selected";
     private final String selectFailure = "picture couldnt be selected";
 
-    private TextView pictureSelected;
     private EditText artistBio;
     private Button submitButton;
+    private TextView textViewToUpdate;
     private ProgressBar mProgressBar;
 
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageRef = storage.getReferenceFromUrl("gs://tattoos-2166f.appspot.com");
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
-
+    private int counter;
     private String picturesDirectory;
-    private Uri selectedImageUri;
-    private Uri downloadUrl;
+    private String locality;
+    private ArrayList<Uri> localImagesUris;
+    private ArrayList<String> downloadUrls;
     private MyApplicationContext mContext;
+    private GPSTracker mGPS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up_artist);
 
-        mContext = (MyApplicationContext)getApplicationContext();
+        mContext = (MyApplicationContext) getApplicationContext();
 
+        mGPS = new GPSTracker(SignUpArtistActivity.this);
+        localImagesUris = new ArrayList<Uri>();
+        downloadUrls = new ArrayList<String>();
 
         mProgressBar = (ProgressBar) findViewById(R.id.signUpProgressBar);
-        pictureSelected = (TextView) findViewById(R.id.artistPictureSelected);
         artistBio = (EditText) findViewById(R.id.artistBio);
         submitButton = (Button) findViewById(R.id.submitButton);
 
+        locality = "undefined";
         picturesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/picFolder/";
         File newdir = new File(picturesDirectory);
         newdir.mkdirs();
+
+        LocalityThread thread = new LocalityThread();
+        new Thread(thread).start();
 
     }
 
@@ -86,16 +96,18 @@ public class SignUpArtistActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         //both take and select photo do the same
         if (resultCode == RESULT_OK) {
-            selectedImageUri = imageReturnedIntent.getData();
-            pictureSelected.setText(selectSuccess);
-            pictureSelected.setBackgroundColor(Color.GREEN);
+            localImagesUris.add(imageReturnedIntent.getData());
+            textViewToUpdate.setText(selectSuccess);
+            textViewToUpdate.setBackgroundColor(Color.GREEN);
         }
     }
 
 
     public void submitButtonClicked(View view) {
 
-        if (artistBio.getText().toString().trim().isEmpty() || selectedImageUri == null) {
+        final String bio = artistBio.getText().toString().trim();
+
+        if (bio.isEmpty() || localImagesUris.size() == 0) {
             Toast.makeText(SignUpArtistActivity.this, "Please fill in all the information", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -117,12 +129,15 @@ public class SignUpArtistActivity extends AppCompatActivity {
                                     "Error: could not fetch user.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            try {
-                                uploadImageFirebase(selectedImageUri,userId,user.username);
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            counter = localImagesUris.size();
+                            for(Uri uri:localImagesUris){
+                                ImageUploaderThread thread = new ImageUploaderThread(uri,userId);
+                                new Thread(thread).start();
                             }
+                            while(counter!=0){
 
+                            }
+                            writeNewArtist(userId,bio,user.username,downloadUrls);
                         }
                     }
 
@@ -137,24 +152,21 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
     }
 
-    private void writeNewArtist(String userId, String bio,String avatarUrl) {
-        ArrayList<String> aux = new ArrayList<>();
-        aux.add("primeira");
-        aux.add("segunda");
-        aux.add("terceira");
-        Artist artist = new Artist(bio,avatarUrl,aux);
-        Map<String, Object> artistValues = artist.toMap();
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/artists/" + userId, artistValues);
-
-        mDatabase.updateChildren(childUpdates);
-
-        Log.d("yyy","adicionei artist");
-        finish();
-    }
-
     public void takePictureButtonClicked(View view) {
+        switch (view.getId()) {
+            case R.id.takePictureButton1:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo1Holder);
+                break;
+            case R.id.takePictureButton2:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo2Holder);
+                break;
+            case R.id.takePictureButton3:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo3Holder);
+                break;
+            case R.id.takePictureButton4:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo4Holder);
+                break;
+        }
         Date now = new Date();
         String pictureName = picturesDirectory + now.getTime() + ".jpg";
         File newfile = new File(pictureName);
@@ -172,33 +184,59 @@ public class SignUpArtistActivity extends AppCompatActivity {
     }
 
     public void choosePictureButtonClicked(View view) {
+        switch (view.getId()) {
+            case R.id.cameraRollButton1:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo1Holder);
+                break;
+            case R.id.cameraRollButton2:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo2Holder);
+                break;
+            case R.id.cameraRollButton3:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo3Holder);
+                break;
+            case R.id.cameraRollButton4:
+                textViewToUpdate = (TextView) findViewById(R.id.tattoo4Holder);
+                break;
+        }
         Intent i = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, SELECT_PHOTO);
     }
 
-    public void uploadImageFirebase(Uri uri, final String uid, final String username) throws IOException {
-        final String bio = artistBio.getText().toString().trim();
-
-        Log.d("yyy","unique? "+uri.getLastPathSegment());
-        StorageReference imagesRef = storageRef.child("images/"+uid).child(uri.getLastPathSegment());
+    public void uploadImageFirebase(Uri uri, final String uid) throws IOException {
+        StorageReference imagesRef = storageRef.child("images/" + uid).child(uri.getLastPathSegment());
         imagesRef.putFile(uri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Log.d("yyy", "uploadFromUri:onSuccess");
-                downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                Log.d("yyy","dwnURI "+downloadUrl);
-
-                writeNewArtist(uid,bio,downloadUrl.toString());
+                Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                downloadUrls.add(downloadUrl.toString());
+                counter--;
             }
         }).addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.w("yyy", "uploadFromUri:onFailure", e);
-                pictureSelected.setText(selectFailure);
-                pictureSelected.setBackgroundColor(Color.RED);
             }
         });
+    }
+
+    private void writeNewArtist(String userId, String bio,String username, ArrayList<String> urls) {
+        Artist artist = new Artist(username,bio, locality, urls);
+        Map<String, Object> artistValues = artist.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/artists/" + userId, artistValues);
+
+        mDatabase.updateChildren(childUpdates);
+        finish();
+    }
+
+    private String getUserLocality() {
+        if (mGPS.canGetLocation()) {
+            JSONObject json = LocationParser.getGoogleLocationInfo(mGPS.getLatitude(), mGPS.getLongitude());
+            return LocationParser.getLocalityFromGoogleJSON(json);
+        }
+        return "undefined";
     }
 
     private void setEditingEnabled(boolean enabled) {
@@ -207,6 +245,34 @@ public class SignUpArtistActivity extends AppCompatActivity {
             submitButton.setVisibility(View.VISIBLE);
         } else {
             submitButton.setVisibility(View.GONE);
+        }
+    }
+
+    final class ImageUploaderThread implements Runnable {
+
+        Uri _uri;
+        String _uid;
+
+        public ImageUploaderThread(Uri uri, String uid) {
+            this._uri = uri;
+            this._uid = uid;
+        }
+
+        @Override
+        public void run() {
+            try {
+                uploadImageFirebase(_uri, _uid);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    final class LocalityThread implements Runnable {
+
+        @Override
+        public void run() {
+            locality = getUserLocality();
         }
     }
 }

@@ -37,10 +37,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ArtistProfileActivity extends AppCompatActivity {
-
-    private GPSTracker mGPS;
 
     private TextView artistBio;
     private TextView artistName;
@@ -61,7 +61,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_profile);
 
-        mGPS = new GPSTracker(ArtistProfileActivity.this);
         mUrls = new ArrayList<String>();
 
         mProgressBar = (ProgressBar) findViewById(R.id.artistProgressBar);
@@ -95,9 +94,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
                                     "Error: could not fetch artist.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            mUrls.add(artist.avatarURL);
+                            HashMap<String,String> tats = (HashMap) dataSnapshot.child("tattoos").getValue();
+                            for(String tatUrl : tats.values()){
+                                mUrls.add(tatUrl);
+                            }
                             adapterView.setUrls(mUrls);
                             artistBio.setText(artist.bio);
+                            artistLocation.setText(artist.locality);
+                            artistName.setText(artist.username);
                         }
                     }
 
@@ -107,14 +111,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
                     }
                 });
 
-    }
-
-    private String getUserLocality() {
-        if (mGPS.canGetLocation()) {
-            JSONObject json = LocationParser.getGoogleLocationInfo(mGPS.getLatitude(), mGPS.getLongitude());
-            return LocationParser.getLocalityFromGoogleJSON(json);
-        }
-        return "";
     }
 
 

@@ -13,30 +13,33 @@ import java.util.Map;
 
 @IgnoreExtraProperties
 public class Artist {
+    public String username;
+    public String locality;
     public String bio;
-    public String avatarURL;
     public ArrayList<String> tattoosUrl;
 
     public Artist() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Artist(String bio, String avatarURL, ArrayList<String> tattoosUrl) {
+    public Artist(String username,String bio, String locality, ArrayList<String> tattoosUrl) {
+        this.username = username;
         this.bio = bio;
-        this.avatarURL = avatarURL;
+        this.locality=locality;
         this.tattoosUrl = tattoosUrl;
     }
 
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
+        result.put("username",username);
         result.put("bio", bio);
-        result.put("avatarURL",avatarURL);
+        result.put("locality",locality);
 
         HashMap<String, Object> tattoos = new HashMap<>();
         int i;
         for(i=0;i<tattoosUrl.size();i++){
-            tattoos.put(""+i,tattoosUrl.get(i));
+            tattoos.put("t"+i,tattoosUrl.get(i));
         }
         result.put("tattoos",tattoos);
         return result;

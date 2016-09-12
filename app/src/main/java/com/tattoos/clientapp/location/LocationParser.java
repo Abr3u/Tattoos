@@ -74,6 +74,6 @@ public class LocationParser {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return "undefined";
     }
 }
