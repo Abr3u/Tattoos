@@ -2,11 +2,11 @@ package com.tattoos.clientapp.activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
@@ -21,7 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
 import com.tattoos.clientapp.enums.IntentKeys;
-import com.tattoos.clientapp.models.Artist;
+import com.tattoos.clientapp.fragments.SelectPictureOriginFragment;
 import com.tattoos.clientapp.models.User;
 
 import java.util.HashMap;
@@ -36,12 +36,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mDatabase;
     private GoogleApiClient mGoogleApiClient;
+    private SelectPictureOriginFragment myfrag;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myfrag = (SelectPictureOriginFragment)getSupportFragmentManager().findFragmentById(R.id.my_fragment);
+
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+        tx.hide(myfrag);
+        tx.commit();
+
+        Log.d("yyy","frag is visi?? "+myfrag.isVisible());
 
         mContext = (MyApplicationContext) getApplicationContext();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -140,5 +149,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void signUpArtistButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this, SignUpArtistActivity.class);
         startActivity(intent);
+    }
+
+    public void fragmentButtonClicked(View view) {
+        Log.d("yyy","frag btn clicked");
+        if(myfrag.isHidden()){
+            getSupportFragmentManager().beginTransaction()
+                    .show(myfrag)
+                    .commit();
+        }else{
+            getSupportFragmentManager().beginTransaction()
+                    .hide(myfrag)
+                    .commit();
+        }
     }
 }

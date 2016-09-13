@@ -48,5 +48,19 @@
             android:id="@+id/signUpArtist"
             android:onClick="signUpArtistButtonClicked"
             android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fragment"
+            android:id="@+id/testFragment"
+            android:onClick="fragmentButtonClicked"
+            android:layout_gravity="center_horizontal" />
+
+        <fragment android:name="com.tattoos.clientapp.fragments.SelectPictureOriginFragment"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/my_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </RelativeLayout>
