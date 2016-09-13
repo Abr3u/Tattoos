@@ -128,13 +128,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public void tattoosButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this, ShowroomActivity.class);
-        intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), "tattoos");
+        intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), "Tattoos");
         startActivity(intent);
     }
 
     public void artistsButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this, ShowroomActivity.class);
-        intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), "artists");
+        intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), "Artists");
         startActivity(intent);
     }
 

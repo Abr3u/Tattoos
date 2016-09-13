@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -39,7 +40,7 @@ import java.util.Map;
 public class ShowroomActivity extends AppCompatActivity {
     private String showroomType;
 
-    private ProgressBar mProgressBar;
+    private TextView showroomTitle;
 
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
@@ -54,6 +55,9 @@ public class ShowroomActivity extends AppCompatActivity {
 
         showroomType = getIntent().getStringExtra(IntentKeys.SHOWROOM_TYPE.toString());
 
+
+        showroomTitle = (TextView)findViewById(R.id.showroomTitleHolder);
+        showroomTitle.setText(showroomType);
         mGridView = (GridView) findViewById(R.id.gridview);
         //mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -94,17 +98,17 @@ public class ShowroomActivity extends AppCompatActivity {
         });
 
         switch (showroomType) {
-            case "tattoos":
+            case "Tattoos":
                 getTattoosFirebase();
                 break;
-            case "artists":
+            case "Artists":
                 getArtistsFirebase();
                 break;
         }
     }
 
     private void getArtistsFirebase() {
-        mDatabase.child("artist").addValueEventListener(new ValueEventListener() {
+        mDatabase.child("artists").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("yyy", "There are " + snapshot.getChildrenCount() + " artists");
