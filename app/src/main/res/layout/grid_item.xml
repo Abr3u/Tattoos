@@ -5,11 +5,10 @@
     android:orientation="vertical"
     android:padding="5dp">
 
-    <com.tattoos.clientapp.adapters.SquareImageView
+    <ImageView
         android:id="@+id/grid_item_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"/>
+        android:layout_width="140dp"
+        android:layout_height="160dp"/>
 
     <TextView
         android:id="@+id/grid_item_title"

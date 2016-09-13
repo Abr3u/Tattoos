@@ -1,8 +1,6 @@
 package com.tattoos.clientapp.adapters;
 
-/**
- * Created by ricar on 07/09/2016.
- */
+
 import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 import com.tattoos.clientapp.R;
 
 public class GridViewAdapter extends ArrayAdapter<GridItem> {
@@ -59,18 +59,20 @@ public class GridViewAdapter extends ArrayAdapter<GridItem> {
 
         GridItem item = mGridData.get(position);
 
-        if(item.getTattoo_title() == null){
-            holder.titleTextView.setText(item.getArtist_name());
-        }else{
+        if(item.isTattoo()){
             holder.titleTextView.setText(item.getTattoo_title());
-        }
-
-        if(item.getTattoo_bytes() == null){
-            Bitmap bmp = decodeSampledBitmap(item.getArtist_avatar(),250,250);
-            holder.imageView.setImageBitmap(bmp);
+            Glide.with(mContext)
+                    .load(item.getTattoo_url())
+                    .centerCrop()
+                    .crossFade()
+                    .into(holder.imageView);
         }else{
-            Bitmap bmp = decodeSampledBitmap(item.getTattoo_bytes(),250,250);
-            holder.imageView.setImageBitmap(bmp);
+            Glide.with(mContext)
+                    .load(item.getArtist_url())
+                    .centerCrop()
+                    .crossFade()
+                    .into(holder.imageView);
+            holder.titleTextView.setText(item.getArtist_name());
         }
         return row;
     }
@@ -78,43 +80,5 @@ public class GridViewAdapter extends ArrayAdapter<GridItem> {
     static class ViewHolder {
         TextView titleTextView;
         ImageView imageView;
-    }
-
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    public static Bitmap decodeSampledBitmap(byte[] array, int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeByteArray(array,0,array.length);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeByteArray(array,0,array.length);
     }
 }

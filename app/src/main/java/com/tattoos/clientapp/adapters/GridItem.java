@@ -1,26 +1,45 @@
 package com.tattoos.clientapp.adapters;
 
 public class GridItem {
-    private byte[] tattoo_bytes;
+    private boolean isTattoo;
+
     private String tattoo_title;
     private String tattoo_artist;
     private String tattoo_style;
     private String tatto_body_part;
+    private String tattoo_url;
 
     private String artist_name;
     private String artist_bio;
-    private byte[] artist_avatar;
+    private String artist_url;
+    private String artist_locality;
 
     public GridItem() {
         super();
     }
 
-    public byte[] getTattoo_bytes() {
-        return tattoo_bytes;
+    public boolean isTattoo() {
+        return isTattoo;
     }
 
-    public void setTattoo_bytes(byte[] tattoo_bytes) {
-        this.tattoo_bytes = tattoo_bytes;
+    public void setIsTattoo(boolean tattoo) {
+        isTattoo = tattoo;
+    }
+
+    public String getTattoo_url() {
+        return tattoo_url;
+    }
+
+    public void setTattoo_url(String tattoo_url) {
+        this.tattoo_url = tattoo_url;
+    }
+
+    public String getArtist_url() {
+        return artist_url;
+    }
+
+    public void setArtist_url(String artist_url) {
+        this.artist_url = artist_url;
     }
 
     public String getTattoo_title() {
@@ -71,12 +90,13 @@ public class GridItem {
         this.artist_bio = artist_bio;
     }
 
-    public byte[] getArtist_avatar() {
-        return artist_avatar;
+    public String getArtist_locality() {
+        return artist_locality;
     }
 
-    public void setArtist_avatar(byte[] artist_avatar) {
-        this.artist_avatar = artist_avatar;
+    public void setArtist_locality(String artist_locality) {
+        this.artist_locality = artist_locality;
     }
+
 
 }

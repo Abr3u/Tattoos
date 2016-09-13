@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,12 +33,13 @@ import com.tattoos.clientapp.location.LocationParser;
 import com.tattoos.clientapp.models.Artist;
 import com.tattoos.clientapp.models.User;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,13 +47,20 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
     private static final int SELECT_PHOTO = 1;
     private static final int TAKE_PHOTO = 2;
-    private final String selectSuccess = "picture selected";
-    private final String selectFailure = "select another picture";
+    private final String selectSuccess = "selected";
+    private final String selectFailure = "select other";
+    private final String loadingText = "just a second, thanks for your patience";
+    private final String addMoreLaterText = "Dont worry, you can add more tattoos later";
 
 
+    private TextView newProfileHolder;
+    private TextView showcaseHolder;
+    private TextView aboutYouHolder;
+    private TextView helperViewHolder;
+    private TableLayout tableLayout;
     private EditText artistBio;
     private Button submitButton;
-    private TextView textViewToUpdate;
+    private Button buttonToUpdate;
     private ProgressBar mProgressBar;
 
     private FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -64,9 +72,9 @@ public class SignUpArtistActivity extends AppCompatActivity {
     private String picturesDirectory;
     private String locality;
     private Uri[] localImagesUris;
-    private ArrayList<String> downloadUrls;
     private MyApplicationContext mContext;
     private GPSTracker mGPS;
+    private ArrayList<String> downloadUrls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +84,14 @@ public class SignUpArtistActivity extends AppCompatActivity {
         mContext = (MyApplicationContext) getApplicationContext();
 
         mGPS = new GPSTracker(SignUpArtistActivity.this);
-        localImagesUris = new Uri[4];
+        localImagesUris = new Uri[3];
         downloadUrls = new ArrayList<String>();
 
+        newProfileHolder = (TextView)findViewById(R.id.signUpArtistBioHolder);
+        showcaseHolder = (TextView)findViewById(R.id.chooseTattosHolder);
+        aboutYouHolder = (TextView) findViewById(R.id.signUpArtistBioHolder);
+        helperViewHolder = (TextView)findViewById(R.id.addMoreTattosLater);
+        tableLayout = (TableLayout) findViewById(R.id.tableSignUp);
         mProgressBar = (ProgressBar) findViewById(R.id.signUpProgressBar);
         artistBio = (EditText) findViewById(R.id.artistBio);
         submitButton = (Button) findViewById(R.id.submitButton);
@@ -92,6 +105,7 @@ public class SignUpArtistActivity extends AppCompatActivity {
         LocalityThread thread = new LocalityThread();
         new Thread(thread).start();
 
+
     }
 
     @Override
@@ -100,16 +114,16 @@ public class SignUpArtistActivity extends AppCompatActivity {
         //both take and select photo do the same
         if (resultCode == RESULT_OK) {
             if (uriAlreadyExists(localImagesUris, imageReturnedIntent.getData())) {
-                textViewToUpdate.setText(selectFailure);
-                textViewToUpdate.setBackgroundColor(Color.RED);
+                buttonToUpdate.setText(selectFailure);
+                buttonToUpdate.setBackgroundColor(Color.RED);
                 return;
             }
             if (counter < 4) {
                 counter++;
                 Log.d("yyy", "counter ficou " + counter);
             }
-            textViewToUpdate.setText(selectSuccess);
-            textViewToUpdate.setBackgroundColor(Color.GREEN);
+            buttonToUpdate.setText(selectSuccess);
+            buttonToUpdate.setBackgroundColor(Color.GREEN);
             localImagesUris[indexToUpdate] = imageReturnedIntent.getData();
         }
     }
@@ -118,7 +132,6 @@ public class SignUpArtistActivity extends AppCompatActivity {
         if (localImagesUris[0] != null && localImagesUris[0].equals(toCheck)) return true;
         if (localImagesUris[1] != null && localImagesUris[1].equals(toCheck)) return true;
         if (localImagesUris[2] != null && localImagesUris[2].equals(toCheck)) return true;
-        if (localImagesUris[3] != null && localImagesUris[3].equals(toCheck)) return true;
         return false;
     }
 
@@ -127,12 +140,13 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
         final String bio = artistBio.getText().toString().trim();
 
-        if (bio.isEmpty() || (localImagesUris[0] == null && localImagesUris[1] == null && localImagesUris[2] == null && localImagesUris[3] == null)) {
+        if (bio.isEmpty() || (localImagesUris[0] == null && localImagesUris[1] == null && localImagesUris[2] == null)) {
             Log.d("yyy", "not all info");
-            Toast.makeText(SignUpArtistActivity.this, "Please fill in all the information", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUpArtistActivity.this, "Please provide at least one tattoo and your bio", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        setEditingEnabled(false);
         // [START single_value_read]
         final String userId = mContext.getFirebaseUser().getUid();
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
@@ -150,18 +164,22 @@ public class SignUpArtistActivity extends AppCompatActivity {
                                     "Error: could not fetch user.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            for (Uri uri : localImagesUris) {
-                                Log.d("yyy","uri -> "+uri);
+                            int i;
+                            for (i = 0; i < localImagesUris.length; i++) {
+                                Uri uri = localImagesUris[i];
+                                Log.d("yyy", "uri -> " + uri);
                                 if (uri != null) {
                                     Log.d("yyy", "uploading img");
-                                    ImageUploaderThread thread = new ImageUploaderThread(uri, userId);
+                                    HashMap<String,String> tattooDetails = getTattooDetails(i);
+                                    tattooDetails.put("artist",userId);
+                                    ImageUploaderThread thread = new ImageUploaderThread(uri, userId,tattooDetails);
                                     new Thread(thread).start();
                                 }
                             }
                             while (counter != 0) {
 
                             }
-                            writeNewArtist(userId, bio, user.username, downloadUrls);
+                            writeNewArtist(userId, bio, user.username,downloadUrls);
                         }
                     }
 
@@ -176,58 +194,90 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
     }
 
-    public void takePictureButtonClicked(View view) {
-        switch (view.getId()) {
-            case R.id.takePictureButton1:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo1Holder);
-                indexToUpdate = 0;
-                break;
-            case R.id.takePictureButton2:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo2Holder);
-                indexToUpdate = 1;
-                break;
-            case R.id.takePictureButton3:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo3Holder);
-                indexToUpdate = 2;
-                break;
-            case R.id.takePictureButton4:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo4Holder);
-                indexToUpdate = 3;
-                break;
+    private HashMap<String, String> getTattooDetails(int i) {
+        HashMap<String, String> details = new HashMap<>();
+        if (i == 0) {
+            EditText titleET = (EditText) findViewById(R.id.TattooDescription11);
+            EditText bodyPartET = (EditText) findViewById(R.id.TattooBodyPart11);
+            EditText styleET = (EditText) findViewById(R.id.TattooStyle11);
+
+            String title = titleET.getText().toString().trim();
+            String bodyPart = bodyPartET.getText().toString().trim();
+            String style = styleET.getText().toString().trim();
+
+            if (title.isEmpty()) {
+                title = "undefined";
+            }
+            if (bodyPart.isEmpty()) {
+                bodyPart = "undefined";
+            }
+            if (style.isEmpty()) {
+                style = "undefined";
+            }
+            details.put("title", title);
+            details.put("bodyPart", bodyPart);
+            details.put("style", style);
         }
-        Date now = new Date();
-        String pictureName = picturesDirectory + now.getTime() + ".jpg";
-        File newfile = new File(pictureName);
-        try {
-            newfile.createNewFile();
-        } catch (IOException e) {
+        if (i == 1) {
+            EditText titleET = (EditText) findViewById(R.id.TattooDescription12);
+            EditText bodyPartET = (EditText) findViewById(R.id.TattooBodyPart12);
+            EditText styleET = (EditText) findViewById(R.id.TattooStyle12);
+
+            String title = titleET.getText().toString().trim();
+            String bodyPart = bodyPartET.getText().toString().trim();
+            String style = styleET.getText().toString().trim();
+
+            if (title.isEmpty()) {
+                title = "undefined";
+            }
+            if (bodyPart.isEmpty()) {
+                bodyPart = "undefined";
+            }
+            if (style.isEmpty()) {
+                style = "undefined";
+            }
+            details.put("title", title);
+            details.put("bodyPart", bodyPart);
+            details.put("style", style);
         }
+        if (i == 2) {
+            EditText titleET = (EditText) findViewById(R.id.TattooDescription13);
+            EditText bodyPartET = (EditText) findViewById(R.id.TattooBodyPart13);
+            EditText styleET = (EditText) findViewById(R.id.TattooStyle13);
 
-        Uri outputFileUri = Uri.fromFile(newfile);
+            String title = titleET.getText().toString().trim();
+            String bodyPart = bodyPartET.getText().toString().trim();
+            String style = styleET.getText().toString().trim();
 
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
-        startActivityForResult(cameraIntent, TAKE_PHOTO);
+            if (title.isEmpty()) {
+                title = "undefined";
+            }
+            if (bodyPart.isEmpty()) {
+                bodyPart = "undefined";
+            }
+            if (style.isEmpty()) {
+                style = "undefined";
+            }
+            details.put("title", title);
+            details.put("bodyPart", bodyPart);
+            details.put("style", style);
+        }
+        return details;
     }
 
     public void choosePictureButtonClicked(View view) {
         switch (view.getId()) {
-            case R.id.cameraRollButton1:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo1Holder);
+            case R.id.selectPictureButton11:
+                buttonToUpdate = (Button) findViewById(R.id.selectPictureButton11);
                 indexToUpdate = 0;
                 break;
-            case R.id.cameraRollButton2:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo2Holder);
+            case R.id.selectPictureButton12:
+                buttonToUpdate = (Button) findViewById(R.id.selectPictureButton12);
                 indexToUpdate = 1;
                 break;
-            case R.id.cameraRollButton3:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo3Holder);
+            case R.id.selectPictureButton13:
+                buttonToUpdate = (Button) findViewById(R.id.selectPictureButton13);
                 indexToUpdate = 2;
-                break;
-            case R.id.cameraRollButton4:
-                textViewToUpdate = (TextView) findViewById(R.id.tattoo4Holder);
-                indexToUpdate = 3;
                 break;
         }
         Intent i = new Intent(Intent.ACTION_PICK,
@@ -235,15 +285,15 @@ public class SignUpArtistActivity extends AppCompatActivity {
         startActivityForResult(i, SELECT_PHOTO);
     }
 
-    public void uploadImageFirebase(Uri uri, final String uid) throws IOException {
+    public void uploadImageFirebase(Uri uri, final String uid, final HashMap<String,String> tattooDetails) throws IOException {
         StorageReference imagesRef = storageRef.child("images/" + uid).child(uri.getLastPathSegment());
         imagesRef.putFile(uri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Uri downloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                downloadUrls.add(downloadUrl.toString());
                 Log.d("yyy", "uploaded");
-                counter--;
+                downloadUrls.add(downloadUrl.toString());
+                writeNewTattoo(downloadUrl.toString(),tattooDetails);
             }
         }).addOnFailureListener(this, new OnFailureListener() {
             @Override
@@ -253,8 +303,8 @@ public class SignUpArtistActivity extends AppCompatActivity {
         });
     }
 
-    private void writeNewArtist(String userId, String bio, String username, ArrayList<String> urls) {
-        Artist artist = new Artist(username, bio, locality, urls);
+    private void writeNewArtist(String userId, String bio, String username,ArrayList<String> urls) {
+        Artist artist = new Artist(username, bio, locality,urls);
         Map<String, Object> artistValues = artist.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -262,6 +312,17 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
         mDatabase.updateChildren(childUpdates);
         finish();
+    }
+
+    private void writeNewTattoo(String tattooUrl, HashMap tattooDetails) {
+        String key = mDatabase.child("tattoos").push().getKey();
+        tattooDetails.put("url",tattooUrl);
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/tattoos/" +key, tattooDetails);
+
+        mDatabase.updateChildren(childUpdates);
+        counter--;
     }
 
     private String getUserLocality() {
@@ -273,10 +334,23 @@ public class SignUpArtistActivity extends AppCompatActivity {
     }
 
     private void setEditingEnabled(boolean enabled) {
-        artistBio.setEnabled(enabled);
         if (enabled) {
+            helperViewHolder.setText(addMoreLaterText);
+            mProgressBar.setVisibility(View.GONE);
+            showcaseHolder.setVisibility(View.VISIBLE);
+            newProfileHolder.setVisibility(View.VISIBLE);
+            aboutYouHolder.setVisibility(View.VISIBLE);
+            artistBio.setVisibility(View.VISIBLE);
+            tableLayout.setVisibility(View.VISIBLE);
             submitButton.setVisibility(View.VISIBLE);
         } else {
+            helperViewHolder.setText(loadingText);
+            mProgressBar.setVisibility(View.VISIBLE);
+            showcaseHolder.setVisibility(View.GONE);
+            newProfileHolder.setVisibility(View.GONE);
+            aboutYouHolder.setVisibility(View.GONE);
+            artistBio.setVisibility(View.GONE);
+            tableLayout.setVisibility(View.GONE);
             submitButton.setVisibility(View.GONE);
         }
     }
@@ -285,16 +359,18 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
         Uri _uri;
         String _uid;
+        HashMap<String,String> _tattooDetails;
 
-        public ImageUploaderThread(Uri uri, String uid) {
+        public ImageUploaderThread(Uri uri, String uid,HashMap tattooDetails) {
             this._uri = uri;
             this._uid = uid;
+            this._tattooDetails = tattooDetails;
         }
 
         @Override
         public void run() {
             try {
-                uploadImageFirebase(_uri, _uid);
+                uploadImageFirebase(_uri, _uid,_tattooDetails);
             } catch (IOException e) {
                 e.printStackTrace();
             }

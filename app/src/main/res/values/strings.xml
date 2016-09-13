@@ -15,4 +15,6 @@
     <string name="submitButton">Submit</string>
     <string name="take_picture">Take Picture</string>
     <string name="showcase_your_tattos">Showcase Your Tattoos</string>
+    <string name="select_picture">Select</string>
+    <string name="dont_worry_you_can_add_more_tattoos_later">Dont worry, you can add more tattoos later</string>
 </resources>

@@ -13,12 +13,19 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
 import com.tattoos.clientapp.adapters.GridItem;
 import com.tattoos.clientapp.adapters.GridViewAdapter;
 import com.tattoos.clientapp.enums.IntentKeys;
 import com.tattoos.clientapp.enums.JSONKeys;
+import com.tattoos.clientapp.models.Artist;
+import com.tattoos.clientapp.models.Tattoo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,24 +33,19 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShowroomActivity extends AppCompatActivity {
-
-    private static final String TAG = ShowroomActivity.class.getSimpleName();
-
     private String showroomType;
-    private boolean cached;
 
-    private MyApplicationContext myApplicationContext;
     private ProgressBar mProgressBar;
-    private Button refreshButton;
 
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
     private ArrayList<GridItem> mGridData;
 
-    private String TATTOOS_URL = "http://192.168.1.69:9999/tattoos?count=10";
-    private String ARTISTS_URL = "http://192.168.1.69:9999/artists";
+    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,41 +54,11 @@ public class ShowroomActivity extends AppCompatActivity {
 
         showroomType = getIntent().getStringExtra(IntentKeys.SHOWROOM_TYPE.toString());
 
-        refreshButton = (Button) findViewById(R.id.refreshButton);
         mGridView = (GridView) findViewById(R.id.gridview);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        myApplicationContext = (MyApplicationContext) getApplicationContext();
+        mGridData = new ArrayList<>();
 
-        switch (showroomType){
-            case "tattoos":
-                if(myApplicationContext.getTattoosCache().isEmpty()){
-                    Log.d("yyy","not cached");
-                    //Initialize with empty data
-                    mGridData = new ArrayList<>();
-                    cached = false;
-                }
-                else{
-                    Log.d("yyy","cached");
-                    //Initialize with cached data
-                    mGridData = myApplicationContext.getTattoosCache();
-                    cached = true;
-                }
-                break;
-            case "artists":
-                if(myApplicationContext.getArtistsCache().isEmpty()){
-                    Log.d("yyy","not cached");
-                    //Initialize with empty data
-                    mGridData = new ArrayList<>();
-                    cached = false;
-                }
-                else{
-                    Log.d("yyy","cached");
-                    //Initialize with cached data
-                    mGridData = myApplicationContext.getArtistsCache();
-                    cached = true;
-                }
-        }
 
         mGridAdapter = new GridViewAdapter(this, R.layout.grid_item, mGridData);
         mGridView.setAdapter(mGridAdapter);
@@ -102,7 +74,7 @@ public class ShowroomActivity extends AppCompatActivity {
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
                     intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), showroomType);
                     intent.putExtra(IntentKeys.TATTOO_TITLE.toString(), item.getTattoo_title());
-                    intent.putExtra(IntentKeys.TATTOO_BYTES.toString(), item.getTattoo_bytes());
+                    intent.putExtra(IntentKeys.TATTOO_URL.toString(), item.getTattoo_url());
                     intent.putExtra(IntentKeys.TATTOO_ARTIST.toString(), item.getTattoo_artist());
                     intent.putExtra(IntentKeys.TATTOO_BODY_PART.toString(), item.getTatto_body_part());
                     intent.putExtra(IntentKeys.TATTOO_STYLE.toString(), item.getTattoo_style());
@@ -112,7 +84,7 @@ public class ShowroomActivity extends AppCompatActivity {
                 if (showroomType.equals("artists")) {
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
                     intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), showroomType);
-                    intent.putExtra(IntentKeys.ARTIST_AVATAR.toString(), item.getArtist_avatar());
+                    intent.putExtra(IntentKeys.ARTIST_URL.toString(), item.getArtist_url());
                     intent.putExtra(IntentKeys.ARTIST_NAME.toString(), item.getArtist_name());
                     intent.putExtra(IntentKeys.ARTIST_BIO.toString(), item.getArtist_bio());
 
@@ -120,62 +92,91 @@ public class ShowroomActivity extends AppCompatActivity {
                 }
             }
         });
+
+        switch (showroomType) {
+            case "tattoos":
+                getTattoosFirebase();
+                break;
+            case "artists":
+                getArtistsFirebase();
+                break;
+        }
     }
 
-    public void refreshButtonClicked(View view) {
+    private void getArtistsFirebase() {
+        mDatabase.child("artist").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Log.d("yyy", "There are " + snapshot.getChildrenCount() + " artists");
+                for (DataSnapshot artistSnapshot : snapshot.getChildren()) {
+                    Artist artist = artistSnapshot.getValue(Artist.class);
 
+                    if (artist == null) {
+                        // Artist is null, error out
+                        Log.e("yyy", "Artist is unexpectedly null");
+                        Toast.makeText(ShowroomActivity.this,
+                                "Error: could not fetch artist.",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        HashMap<String, String> tats = (HashMap) artistSnapshot.child("tattoos").getValue();
+                        Log.d("yyy", artist.username);
+
+                        Map.Entry<String, String> entry = tats.entrySet().iterator().next();
+
+                        GridItem item = new GridItem();
+                        item.setIsTattoo(false);
+                        item.setArtist_url(entry.getValue());
+                        item.setArtist_bio(artist.bio);
+                        item.setArtist_name(artist.username);
+                        item.setArtist_locality(artist.locality);
+                        mGridData.add(item);
+                    }
+                }
+                mGridAdapter.setGridData(mGridData);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("yyy", "getUser:onCancelled", databaseError.toException());
+            }
+        });
     }
 
-    private void parseResult(String result) {
+    private void getTattoosFirebase() {
+        mDatabase.child("tattoos").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Log.d("yyy", "There are " + snapshot.getChildrenCount() + " tattoos");
+                for (DataSnapshot tattooSnapshot : snapshot.getChildren()) {
+                    Tattoo tattoo = tattooSnapshot.getValue(Tattoo.class);
 
-        if (showroomType.equals("tattoos")) {
+                    if (tattoo == null) {
+                        // Artist is null, error out
+                        Log.e("yyy", "Tattoo is unexpectedly null");
+                        Toast.makeText(ShowroomActivity.this,
+                                "Error: could not fetch tattoo.",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("yyy", tattoo.bodyPart);
 
-            try {
-                JSONArray images = new JSONArray(result);
-                GridItem item;
-                for (int i = 0; i < images.length(); i++) {
-                    JSONObject image = images.optJSONObject(i);
-                    String title = image.optString(JSONKeys.TATTOO_TITLE.toString());
-                    String artist = image.optString(JSONKeys.TATTOO_ARTIST.toString());
-                    String bodyPart = image.optString(JSONKeys.TATTOO_BODY_PART.toString());
-                    String style = image.optString(JSONKeys.TATTOO_STYLE.toString());
+                        GridItem item = new GridItem();
+                        item.setIsTattoo(true);
+                        item.setTattoo_title(tattoo.title);
+                        item.setTattoo_url(tattoo.url);
+                        item.setTattoo_artist(tattoo.artist);
+                        item.setTatto_body_part(tattoo.bodyPart);
+                        item.setTattoo_style(tattoo.style);
+                        mGridData.add(item);
+                    }
 
-                    String imageStr = image.optString(JSONKeys.TATTOO_BYTES.toString());
-                    byte[] imgBytes = Base64.decode(imageStr, Base64.DEFAULT);
-
-                    item = new GridItem();
-                    item.setTattoo_title(title);
-                    item.setTattoo_bytes(imgBytes);
-                    item.setTattoo_artist(artist);
-                    item.setTatto_body_part(bodyPart);
-                    item.setTattoo_style(style);
-                    mGridData.add(item);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+                mGridAdapter.setGridData(mGridData);
             }
-        }
-        if (showroomType.equals("artists")) {
-            try {
-                JSONArray artists = new JSONArray(result);
-                GridItem item;
-                for (int i = 0; i < artists.length(); i++) {
-                    JSONObject artist = artists.optJSONObject(i);
-                    String name = artist.optString(JSONKeys.ARTIST_NAME.toString());
-                    String bio = artist.optString(JSONKeys.ARTIST_BIO.toString());
 
-                    String avatarStr = artist.optString(JSONKeys.ARTIST_AVATAR.toString());
-                    byte[] imgBytes = Base64.decode(avatarStr, Base64.DEFAULT);
-
-                    item = new GridItem();
-                    item.setArtist_avatar(imgBytes);
-                    item.setArtist_bio(bio);
-                    item.setArtist_name(name);
-                    mGridData.add(item);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w("yyy", "getUser:onCancelled", databaseError.toException());
             }
-        }
+        });
     }
 }

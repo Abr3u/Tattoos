@@ -45,12 +45,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         setContentView(R.layout.activity_main);
 
         myfrag = (SelectPictureOriginFragment)getSupportFragmentManager().findFragmentById(R.id.my_fragment);
-
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.hide(myfrag);
         tx.commit();
-
-        Log.d("yyy","frag is visi?? "+myfrag.isVisible());
 
         mContext = (MyApplicationContext) getApplicationContext();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -152,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     public void fragmentButtonClicked(View view) {
-        Log.d("yyy","frag btn clicked");
         if(myfrag.isHidden()){
             getSupportFragmentManager().beginTransaction()
                     .show(myfrag)

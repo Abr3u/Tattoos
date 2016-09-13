@@ -5,7 +5,7 @@ package com.tattoos.clientapp.enums;
  */
 public enum IntentKeys {
     SHOWROOM_TYPE,
-    TATTOO_BYTES,
+    TATTOO_URL,
     TATTOO_TITLE,
     TATTOO_ARTIST,
     TATTOO_STYLE,
@@ -13,5 +13,5 @@ public enum IntentKeys {
 
     ARTIST_NAME,
     ARTIST_BIO,
-    ARTIST_AVATAR
+    ARTIST_URL
 }

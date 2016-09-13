@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Crate your Artist Profile"
+            android:text="Create your Artist Profile"
             android:textStyle="bold"
             android:id="@+id/signUpArtistHolder" />
 
@@ -44,141 +44,132 @@
             android:textStyle="bold"
             android:id="@+id/chooseTattosHolder" />
 
-        <LinearLayout
+        <TableLayout
+            android:id="@+id/tableSignUp"
             android:layout_marginTop="20dp"
-            android:orientation="horizontal"
+            android:shrinkColumns="*"  android:stretchColumns="*"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignParentBottom="true">
 
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
+            <TableRow
                 android:layout_height="wrap_content"
-                android:text="@string/choose_existing_picture"
-                android:id="@+id/cameraRollButton1"
-                android:onClick="choosePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
+                android:layout_width="match_parent">
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:orientation="vertical" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
 
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/take_picture"
-                android:id="@+id/takePictureButton1"
-                android:onClick="takePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/select_picture"
+                            android:id="@+id/selectPictureButton11"
+                            android:onClick="choosePictureButtonClicked"
+                            android:layout_gravity="center_horizontal" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:hint="no picture selected"
-                android:id="@+id/tattoo1Holder"
-                android:layout_gravity="center_vertical" />
+                        <EditText
+                            android:hint="title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooDescription11"
+                            android:layout_gravity="center_horizontal" />
 
-        </LinearLayout>
+                        <EditText
+                            android:hint="body part"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooBodyPart11"
+                            android:layout_gravity="center_horizontal" />
 
-        <LinearLayout
+                        <EditText
+                            android:hint="style"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooStyle11"
+                            android:layout_gravity="center_horizontal" />
+
+                    </LinearLayout>
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:orientation="vertical" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/select_picture"
+                            android:id="@+id/selectPictureButton12"
+                            android:onClick="choosePictureButtonClicked"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:hint="title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooDescription12"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:hint="body part"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooBodyPart12"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:hint="style"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooStyle12"
+                            android:layout_gravity="center_horizontal" />
+
+                    </LinearLayout>
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:orientation="vertical" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/select_picture"
+                            android:id="@+id/selectPictureButton13"
+                            android:onClick="choosePictureButtonClicked"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:hint="title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooDescription13"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:hint="body part"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooBodyPart13"
+                            android:layout_gravity="center_horizontal" />
+
+                        <EditText
+                            android:hint="style"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/TattooStyle13"
+                            android:layout_gravity="center_horizontal" />
+
+                    </LinearLayout>
+            </TableRow>
+        </TableLayout>
+
+        <TextView
             android:layout_marginTop="20dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_existing_picture"
-                android:id="@+id/cameraRollButton2"
-                android:onClick="choosePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/take_picture"
-                android:id="@+id/takePictureButton2"
-                android:onClick="takePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:hint="no picture selected"
-                android:id="@+id/tattoo2Holder"
-                android:layout_gravity="center_vertical" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_existing_picture"
-                android:id="@+id/cameraRollButton3"
-                android:onClick="choosePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/take_picture"
-                android:id="@+id/takePictureButton3"
-                android:onClick="takePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:hint="no picture selected"
-                android:id="@+id/tattoo3Holder"
-                android:layout_gravity="center_vertical" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_existing_picture"
-                android:id="@+id/cameraRollButton4"
-                android:onClick="choosePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/take_picture"
-                android:id="@+id/takePictureButton4"
-                android:onClick="takePictureButtonClicked"
-                android:layout_gravity="center_vertical" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:hint="no picture selected"
-                android:id="@+id/tattoo4Holder"
-                android:layout_gravity="center_vertical" />
-
-        </LinearLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/dont_worry_you_can_add_more_tattoos_later"
+            android:id="@+id/addMoreTattosLater"
+            android:textStyle="italic"
+            android:layout_gravity="left" />
 
         <LinearLayout
             android:layout_marginTop="20dp"

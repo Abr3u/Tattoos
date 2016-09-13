@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true">
+
+<TableRow android:weightSum="3"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include layout="@layout/insert_tattoo_layout"/>
+        <include layout="@layout/insert_tattoo_layout"/>
+        <include layout="@layout/insert_tattoo_layout"/>
+        </LinearLayout>
+</TableRow>
+    <TableRow android:weightSum="3"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <include layout="@layout/insert_tattoo_layout"/>
+            <include layout="@layout/insert_tattoo_layout"/>
+            <include layout="@layout/insert_tattoo_layout"/>
+        </LinearLayout>
+    </TableRow>
+</TableLayout>

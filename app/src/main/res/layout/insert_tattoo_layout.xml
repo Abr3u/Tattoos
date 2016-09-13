@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_picture"
+        android:id="@+id/selectPictureButton"
+        android:onClick="choosePictureButtonClicked"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:hint="description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/TattooDescription"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:hint="body part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/TattooBodyPart"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:hint="style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/TattooStyle"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

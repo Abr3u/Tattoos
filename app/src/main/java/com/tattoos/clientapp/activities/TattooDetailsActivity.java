@@ -35,7 +35,7 @@ public class TattooDetailsActivity extends ActionBarActivity {
             String artist = getIntent().getStringExtra(IntentKeys.TATTOO_ARTIST.toString());
             String style = getIntent().getStringExtra(IntentKeys.TATTOO_STYLE.toString());
             String bodyPart = getIntent().getStringExtra(IntentKeys.TATTOO_BODY_PART.toString());
-            byte[] image = getIntent().getByteArrayExtra(IntentKeys.TATTOO_BYTES.toString());
+            byte[] image = getIntent().getByteArrayExtra(IntentKeys.TATTOO_URL.toString());
 
             titleTextView.setText(title);
             authorTextView.setText("By : "+artist);
@@ -46,7 +46,7 @@ public class TattooDetailsActivity extends ActionBarActivity {
         if(showroomType.equals("artists")){
             String name = getIntent().getStringExtra(IntentKeys.ARTIST_NAME.toString());
             String bio = getIntent().getStringExtra(IntentKeys.ARTIST_BIO.toString());
-            byte[] avatar = getIntent().getByteArrayExtra(IntentKeys.ARTIST_AVATAR.toString());
+            byte[] avatar = getIntent().getByteArrayExtra(IntentKeys.ARTIST_URL.toString());
 
             titleTextView.setText(name);
             authorTextView.setText(bio);
