@@ -15,6 +15,8 @@ import java.util.Map;
 public class Artist {
     public String username;
     public String locality;
+    public String latitude;
+    public String longitude;
     public String bio;
     public ArrayList<String> tattoosUrl;
 
@@ -22,10 +24,12 @@ public class Artist {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Artist(String username,String bio, String locality, ArrayList<String> tattoosUrl) {
+    public Artist(String username,String bio, String locality,String lati,String longi, ArrayList<String> tattoosUrl) {
         this.username = username;
         this.bio = bio;
         this.locality=locality;
+        this.latitude = lati;
+        this.longitude = longi;
         this.tattoosUrl = tattoosUrl;
     }
 
@@ -35,6 +39,8 @@ public class Artist {
         result.put("username",username);
         result.put("bio", bio);
         result.put("locality",locality);
+        result.put("latitude",latitude);
+        result.put("longitude",longitude);
 
         HashMap<String, Object> tattoos = new HashMap<>();
         int i;

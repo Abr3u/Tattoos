@@ -22,6 +22,7 @@ import com.tattoos.clientapp.MyApplicationContext;
 import com.tattoos.clientapp.R;
 import com.tattoos.clientapp.enums.IntentKeys;
 import com.tattoos.clientapp.fragments.SelectPictureOriginFragment;
+import com.tattoos.clientapp.location.GPSTracker;
 import com.tattoos.clientapp.models.User;
 
 import java.util.HashMap;

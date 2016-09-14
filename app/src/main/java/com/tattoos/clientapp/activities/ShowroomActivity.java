@@ -166,6 +166,8 @@ public class ShowroomActivity extends AppCompatActivity {
                         item.setArtist_bio(artist.bio);
                         item.setArtist_name(artist.username);
                         item.setArtist_locality(artist.locality);
+                        item.setArtist_latitude(artist.latitude);
+                        item.setArtist_longitude(artist.longitude);
                         mGridData.add(item);
                     }
                 }

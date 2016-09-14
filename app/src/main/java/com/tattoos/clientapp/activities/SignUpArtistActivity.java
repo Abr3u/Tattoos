@@ -2,6 +2,7 @@ package com.tattoos.clientapp.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -70,6 +71,8 @@ public class SignUpArtistActivity extends AppCompatActivity {
     private int counter;
     private int indexToUpdate;
     private String picturesDirectory;
+    private String latitude;
+    private String longitude;
     private String locality;
     private Uri[] localImagesUris;
     private MyApplicationContext mContext;
@@ -98,6 +101,8 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
         counter = 0;
         locality = "undefined";
+        latitude = "undefined";
+        longitude = "undefined";
         picturesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/picFolder/";
         File newdir = new File(picturesDirectory);
         newdir.mkdirs();
@@ -304,7 +309,7 @@ public class SignUpArtistActivity extends AppCompatActivity {
     }
 
     private void writeNewArtist(String userId, String bio, String username,ArrayList<String> urls) {
-        Artist artist = new Artist(username, bio, locality,urls);
+        Artist artist = new Artist(username, bio, locality,latitude,longitude,urls);
         Map<String, Object> artistValues = artist.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -327,7 +332,9 @@ public class SignUpArtistActivity extends AppCompatActivity {
 
     private String getUserLocality() {
         if (mGPS.canGetLocation()) {
-            JSONObject json = LocationParser.getGoogleLocationInfo(mGPS.getLatitude(), mGPS.getLongitude());
+            latitude = ""+mGPS.getLatitude();
+            longitude = ""+mGPS.getLongitude();
+            JSONObject json = LocationParser.getGoogleLocationInfo(latitude, longitude);
             return LocationParser.getLocalityFromGoogleJSON(json);
         }
         return "undefined";

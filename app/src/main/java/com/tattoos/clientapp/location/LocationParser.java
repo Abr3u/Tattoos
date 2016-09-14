@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 public class LocationParser {
 
-    public static JSONObject getGoogleLocationInfo(double lati, double longi) {
+    public static JSONObject getGoogleLocationInfo(String lati, String longi) {
 
         HttpGet httpGet = new HttpGet("http://maps.google.com/maps/api/geocode/json?latlng=" + lati + "," + longi + "&sensor=true");
         HttpClient client = new DefaultHttpClient();

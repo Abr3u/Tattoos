@@ -13,6 +13,8 @@ public class GridItem {
     private String artist_bio;
     private String artist_url;
     private String artist_locality;
+    private String artist_latitude;
+    private String artist_longitude;
 
     public GridItem() {
         super();
@@ -96,6 +98,22 @@ public class GridItem {
 
     public void setArtist_locality(String artist_locality) {
         this.artist_locality = artist_locality;
+    }
+
+    public String getArtist_longitude() {
+        return artist_longitude;
+    }
+
+    public void setArtist_longitude(String artist_longitude) {
+        this.artist_longitude = artist_longitude;
+    }
+
+    public String getArtist_latitude() {
+        return artist_latitude;
+    }
+
+    public void setArtist_latitude(String artist_latitude) {
+        this.artist_latitude = artist_latitude;
     }
 
 
