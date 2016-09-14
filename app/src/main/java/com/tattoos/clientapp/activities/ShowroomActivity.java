@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,9 +41,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShowroomActivity extends AppCompatActivity {
+
+    private final String searchTattooHint = "search by title/artist/body part/style";
+    private final String searchArtistHint = "search by name/locality";
+
     private String showroomType;
 
     private TextView showroomTitle;
+    private EditText searchET;
 
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
@@ -56,6 +64,34 @@ public class ShowroomActivity extends AppCompatActivity {
         showroomType = getIntent().getStringExtra(IntentKeys.SHOWROOM_TYPE.toString());
 
         showroomTitle = (TextView)findViewById(R.id.showroomTitleHolder);
+
+        searchET = (EditText)findViewById(R.id.searchET);
+        if(showroomType.equals("Tattoos")){
+            searchET.setHint(searchTattooHint);
+        }else{
+            searchET.setHint(searchArtistHint);
+        }
+
+        searchET.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                mGridAdapter.getFilter().filter(cs);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
         showroomTitle.setText(showroomType);
         mGridView = (GridView) findViewById(R.id.gridview);
         //mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -73,7 +109,6 @@ public class ShowroomActivity extends AppCompatActivity {
                 GridItem item = (GridItem) parent.getItemAtPosition(position);
 
                 if (item.isTattoo()) {
-                    Log.d("yyy","era tattoo");
                     //Pass the image details to TattooDetailsActivity
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
 
@@ -86,7 +121,6 @@ public class ShowroomActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else {
-                    Log.d("yyy","nao era tattoo");
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
                     intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), showroomType);
                     intent.putExtra(IntentKeys.ARTIST_LOCALITY.toString(),item.getArtist_locality());
@@ -112,7 +146,6 @@ public class ShowroomActivity extends AppCompatActivity {
         mDatabase.child("artists").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Log.d("yyy", "There are " + snapshot.getChildrenCount() + " artists");
                 for (DataSnapshot artistSnapshot : snapshot.getChildren()) {
                     Artist artist = artistSnapshot.getValue(Artist.class);
 
@@ -124,7 +157,6 @@ public class ShowroomActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                     } else {
                         HashMap<String, String> tats = (HashMap) artistSnapshot.child("tattoos").getValue();
-                        Log.d("yyy", artist.username);
 
                         Map.Entry<String, String> entry = tats.entrySet().iterator().next();
 
@@ -162,9 +194,6 @@ public class ShowroomActivity extends AppCompatActivity {
                                 "Error: could not fetch tattoo.",
                                 Toast.LENGTH_SHORT).show();
                     } else {
-                        Log.d("yyy", tattoo.bodyPart);
-                        Log.d("yyy",tattoo.style);
-
                         GridItem item = new GridItem();
                         item.setIsTattoo(true);
                         item.setTattoo_title(tattoo.title);
