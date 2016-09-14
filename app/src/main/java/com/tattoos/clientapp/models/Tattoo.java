@@ -10,17 +10,19 @@ public class Tattoo {
     public String bodyPart;
     public String style;
     public String artist;
+    public String artistName;
     public String url;
 
 
     public Tattoo(){}
 
-    public Tattoo(String title,String bodyPart,String style,String artist,String url){
+    public Tattoo(String title,String bodyPart,String style,String artist,String url,String artistName){
         this.title=title;
         this.bodyPart=bodyPart;
         this.style=style;
         this.artist=artist;
         this.url=url;
+        this.artistName = artistName;
     }
 
     @Exclude
@@ -30,6 +32,7 @@ public class Tattoo {
         result.put("bodyPart", bodyPart);
         result.put("style",style);
         result.put("artist",artist);
+        result.put("artistName",artistName);
         result.put("url",url);
         return result;
     }

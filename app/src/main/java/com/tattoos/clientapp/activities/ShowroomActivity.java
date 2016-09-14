@@ -55,7 +55,6 @@ public class ShowroomActivity extends AppCompatActivity {
 
         showroomType = getIntent().getStringExtra(IntentKeys.SHOWROOM_TYPE.toString());
 
-
         showroomTitle = (TextView)findViewById(R.id.showroomTitleHolder);
         showroomTitle.setText(showroomType);
         mGridView = (GridView) findViewById(R.id.gridview);
@@ -73,25 +72,27 @@ public class ShowroomActivity extends AppCompatActivity {
                 //Get item at position
                 GridItem item = (GridItem) parent.getItemAtPosition(position);
 
-                if (showroomType.equals("tattoos")) {
+                if (item.isTattoo()) {
+                    Log.d("yyy","era tattoo");
                     //Pass the image details to TattooDetailsActivity
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
+
                     intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), showroomType);
                     intent.putExtra(IntentKeys.TATTOO_TITLE.toString(), item.getTattoo_title());
                     intent.putExtra(IntentKeys.TATTOO_URL.toString(), item.getTattoo_url());
                     intent.putExtra(IntentKeys.TATTOO_ARTIST.toString(), item.getTattoo_artist());
                     intent.putExtra(IntentKeys.TATTOO_BODY_PART.toString(), item.getTatto_body_part());
                     intent.putExtra(IntentKeys.TATTOO_STYLE.toString(), item.getTattoo_style());
-
                     startActivity(intent);
                 }
-                if (showroomType.equals("artists")) {
+                else {
+                    Log.d("yyy","nao era tattoo");
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
                     intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), showroomType);
+                    intent.putExtra(IntentKeys.ARTIST_LOCALITY.toString(),item.getArtist_locality());
                     intent.putExtra(IntentKeys.ARTIST_URL.toString(), item.getArtist_url());
                     intent.putExtra(IntentKeys.ARTIST_NAME.toString(), item.getArtist_name());
                     intent.putExtra(IntentKeys.ARTIST_BIO.toString(), item.getArtist_bio());
-
                     startActivity(intent);
                 }
             }
@@ -162,12 +163,13 @@ public class ShowroomActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d("yyy", tattoo.bodyPart);
+                        Log.d("yyy",tattoo.style);
 
                         GridItem item = new GridItem();
                         item.setIsTattoo(true);
                         item.setTattoo_title(tattoo.title);
                         item.setTattoo_url(tattoo.url);
-                        item.setTattoo_artist(tattoo.artist);
+                        item.setTattoo_artist(tattoo.artistName);
                         item.setTatto_body_part(tattoo.bodyPart);
                         item.setTattoo_style(tattoo.style);
                         mGridData.add(item);

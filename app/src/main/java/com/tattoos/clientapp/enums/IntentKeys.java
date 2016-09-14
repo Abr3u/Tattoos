@@ -13,5 +13,6 @@ public enum IntentKeys {
 
     ARTIST_NAME,
     ARTIST_BIO,
-    ARTIST_URL
+    ARTIST_URL,
+    ARTIST_LOCALITY
 }

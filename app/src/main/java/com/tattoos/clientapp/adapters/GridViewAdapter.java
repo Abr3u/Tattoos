@@ -67,12 +67,12 @@ public class GridViewAdapter extends ArrayAdapter<GridItem> {
                     .crossFade()
                     .into(holder.imageView);
         }else{
+            holder.titleTextView.setText(item.getArtist_name());
             Glide.with(mContext)
                     .load(item.getArtist_url())
                     .centerCrop()
                     .crossFade()
                     .into(holder.imageView);
-            holder.titleTextView.setText(item.getArtist_name());
         }
         return row;
     }
