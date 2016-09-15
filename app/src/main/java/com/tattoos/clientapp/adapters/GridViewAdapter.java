@@ -41,6 +41,7 @@ public class GridViewAdapter extends ArrayAdapter<GridItem>implements Filterable
      */
     public void setGridData(ArrayList<GridItem> mGridData) {
         this.mGridData = mGridData;
+        this.mGridDataFiltered = mGridData;
         notifyDataSetChanged();
     }
 

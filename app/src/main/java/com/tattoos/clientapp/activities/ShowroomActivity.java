@@ -28,8 +28,10 @@ import com.tattoos.clientapp.adapters.GridItem;
 import com.tattoos.clientapp.adapters.GridViewAdapter;
 import com.tattoos.clientapp.enums.IntentKeys;
 import com.tattoos.clientapp.enums.JSONKeys;
+import com.tattoos.clientapp.location.GPSTracker;
 import com.tattoos.clientapp.models.Artist;
 import com.tattoos.clientapp.models.Tattoo;
+import com.tattoos.clientapp.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,12 +66,12 @@ public class ShowroomActivity extends AppCompatActivity {
 
         showroomType = getIntent().getStringExtra(IntentKeys.SHOWROOM_TYPE.toString());
 
-        showroomTitle = (TextView)findViewById(R.id.showroomTitleHolder);
+        showroomTitle = (TextView) findViewById(R.id.showroomTitleHolder);
 
-        searchET = (EditText)findViewById(R.id.searchET);
-        if(showroomType.equals("Tattoos")){
+        searchET = (EditText) findViewById(R.id.searchET);
+        if (showroomType.equals("Tattoos")) {
             searchET.setHint(searchTattooHint);
-        }else{
+        } else {
             searchET.setHint(searchArtistHint);
         }
 
@@ -94,10 +97,8 @@ public class ShowroomActivity extends AppCompatActivity {
 
         showroomTitle.setText(showroomType);
         mGridView = (GridView) findViewById(R.id.gridview);
-        //mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         mGridData = new ArrayList<>();
-
 
         mGridAdapter = new GridViewAdapter(this, R.layout.grid_item, mGridData);
         mGridView.setAdapter(mGridAdapter);
@@ -119,11 +120,10 @@ public class ShowroomActivity extends AppCompatActivity {
                     intent.putExtra(IntentKeys.TATTOO_BODY_PART.toString(), item.getTatto_body_part());
                     intent.putExtra(IntentKeys.TATTOO_STYLE.toString(), item.getTattoo_style());
                     startActivity(intent);
-                }
-                else {
+                } else {
                     Intent intent = new Intent(ShowroomActivity.this, TattooDetailsActivity.class);
                     intent.putExtra(IntentKeys.SHOWROOM_TYPE.toString(), showroomType);
-                    intent.putExtra(IntentKeys.ARTIST_LOCALITY.toString(),item.getArtist_locality());
+                    intent.putExtra(IntentKeys.ARTIST_LOCALITY.toString(), item.getArtist_locality());
                     intent.putExtra(IntentKeys.ARTIST_URL.toString(), item.getArtist_url());
                     intent.putExtra(IntentKeys.ARTIST_NAME.toString(), item.getArtist_name());
                     intent.putExtra(IntentKeys.ARTIST_BIO.toString(), item.getArtist_bio());
@@ -171,6 +171,7 @@ public class ShowroomActivity extends AppCompatActivity {
                         mGridData.add(item);
                     }
                 }
+                sortArtistsByDistanceToSelf();
                 mGridAdapter.setGridData(mGridData);
             }
 
@@ -179,6 +180,40 @@ public class ShowroomActivity extends AppCompatActivity {
                 Log.w("yyy", "getUser:onCancelled", databaseError.toException());
             }
         });
+    }
+
+    private void sortArtistsByDistanceToSelf() {
+        GPSTracker gps = new GPSTracker(this);
+
+        if (gps.canGetLocation()) {
+            double[] distances = new double[mGridData.size()];
+            HashMap<Double,GridItem> distance_item = new HashMap<>(mGridData.size());
+
+            double myLati = gps.getLatitude();
+            double myLongi = gps.getLongitude();
+
+            //store distances to my location
+            int i = 0;
+            for(GridItem unsorted : mGridData){
+                double lati = Double.parseDouble(unsorted.getArtist_latitude());
+                double longi = Double.parseDouble(unsorted.getArtist_longitude());
+                double distance = Utils.distance(myLati,lati,myLongi,longi,0.0,0.0);
+
+                distances[i] = distance;
+                distance_item.put(distance,unsorted);
+                i++;
+            }
+
+            //order based on distance (closer first)
+            Arrays.sort(distances);
+
+            //update GridData
+            mGridData = new ArrayList<>();
+            for(i=0;i<distances.length;i++){
+                mGridData.add(distance_item.get(distances[i]));
+                Log.d("yyy","adicionei "+distance_item.get(distances[i]).getArtist_name()+" com distancia "+distances[i]);
+            }
+        }
     }
 
     private void getTattoosFirebase() {

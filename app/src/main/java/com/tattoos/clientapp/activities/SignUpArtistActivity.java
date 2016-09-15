@@ -177,6 +177,7 @@ public class SignUpArtistActivity extends AppCompatActivity {
                                     Log.d("yyy", "uploading img");
                                     HashMap<String,String> tattooDetails = getTattooDetails(i);
                                     tattooDetails.put("artist",userId);
+									tattooDetails.put("artistName",user.username);
                                     ImageUploaderThread thread = new ImageUploaderThread(uri, userId,tattooDetails);
                                     new Thread(thread).start();
                                 }
